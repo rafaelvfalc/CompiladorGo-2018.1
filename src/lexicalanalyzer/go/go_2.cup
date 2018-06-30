@@ -1,0 +1,128 @@
+package lexicalanalyzer.go;
+
+import java_cup.runtime.*;
+
+parser code {:
+
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+
+            if (s.left  == 0) {
+                m.append(" in line "+(s.left - 1));
+                if (s.right  == 0)
+                    m.append(", column "+(s.right - 1));
+            }
+        }
+
+        m.append(" : "+message);
+
+        /* Print the contents of the StringBuilder 'm', which contains
+           an error message, out on a line. */
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+
+// Terminais
+
+terminal BREAK, CASE, CHAN, CONST, CONTINUE, DEFAULT;
+terminal DEFER, ELSE, FALLTHROUGH, FOR, FUNC, GO, GOTO;
+terminal IF, IMPORT, INTERFACE, MAP, PACKAGE, RANGE, RETURN;
+terminal SELECT, STRUCT, SWITCH, TYPE, VAR, BOOL;
+terminal STRING, INT, INT8, INT16, INT32, INT64;
+terminal UINT, UINT8, UINT16, UINT32, UINT64, UINTPTR;
+terminal BYTE, RUNE, FLOAT32, FLOAT64, COMPLEX64;
+terminal COMPLEX128, TRUE, FALSE, LPAREN, RPAREN;
+terminal LBRACE, RBRACE, LBRACK, RBRACK, SEMICOLON;
+terminal COMMA, DOT, COLON, EQUAL, GREATER, LESS;
+terminal NOT, EQEQ, LTEQ, GTEQ, NOTEQ, ANDAND, OROR;
+terminal PLUSPLUS, MINUSMINUS, PLUS, MINUS, MULT, DIV;
+terminal AND, OR, XOR, MOD, LSHIFT, RSHIFT, PLUSEQ;
+terminal MINUSEQ, MULTEQ, DIVEQ, ANDEQ, OREQ, XOREQ;
+terminal MODEQ, LSHIFTEQ, RSHIFTEQ, ID, NUMERO, COMENTARIO;
+terminal a , b , c , d , e , f , A , B , C , D , E , F, x; 
+terminal X, l, input_character, escape_character, except; 
+terminal STRING_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL;
+terminal UNDERSCORE, QUOTE, SUSPOINTS;
+
+// Nao terminais
+non terminal compilation_unit, package_clause_aux, identifier, package_name, package_clause, import_clause, import_clause_e;
+non terminal import_clause_e_aux, import_clause_aux, import_name, import_name_aux, import_clause_aux_2, import_name_aux_2;
+non terminal function_decl, type_declaration, type_declaration_e, type_declaration_e_aux, function_name, signature, parameters;
+non terminal result_aux, result, parameters_list, parameters_list_aux, parameter_decl, identifier_list, identifier_list_aux;
+non terminal identifier_list_aux_2, sus_points_aux, qualified_identifier, type_name;
+
+start with compilation_unit;
+
+compilation_unit ::= package_clause_aux import_clause_e_aux  type_declaration_e_aux;
+
+// Identifier
+
+identifier ::= ID;
+
+// Package clause FUNCIONANDO!
+
+package_clause_aux ::= | package_clause;
+package_clause ::= PACKAGE package_name;
+package_name ::= identifier
+		| package_name DOT identifier;
+		
+// Import clause FUNCIONANDO PARCIALMENTE!
+
+// Observacao: import "fmt.tst" e "fmt/tst" nao estao funcionando VERIFICAR DEPOIS!
+
+import_clause_e_aux ::= | import_clause_e;
+import_clause_e ::= import_clause | import_clause import_clause_e;
+import_clause ::= IMPORT import_name
+                  | IMPORT LPAREN import_name import_name_aux_2 RPAREN;
+
+import_name ::= import_clause_aux import_name_aux;
+import_name_aux ::=  QUOTE identifier  QUOTE 
+		           | QUOTE import_name DOT identifier QUOTE;    
+import_name_aux_2 ::= | import_name import_name_aux_2;                    
+import_clause_aux ::= | import_clause_aux_2;
+import_clause_aux_2 ::= DOT | UNDERSCORE;
+
+// Type declarations
+
+type_declaration_e_aux ::= | type_declaration_e:t {:RESULT = t;:};
+type_declaration_e ::= type_declaration:t {:RESULT = t;:}
+			| type_declaration_e type_declaration;
+type_declaration ::= function_decl;
+		//| method_decl | interface_decl;
+
+// Function Types
+
+signature ::= parameters | result_aux;
+result_aux ::= | result;
+result ::= ;
+parameters ::= LPAREN parameters_list_aux RPAREN;
+parameters_list_aux ::= | parameters_list;
+parameters_list ::= parameter_decl; //| parameter_decl parameters_list_aux ;
+parameter_decl ::= identifier_list_aux_2 sus_points_aux; //type; COMECAR DAQUI!!!!!!!!!
+sus_points_aux ::= | SUSPOINTS;
+
+// Function declarations
+
+function_decl ::= FUNC function_name signature; // LBRACE function_body RBRACE;
+function_name ::= identifier;
+
+// Constant declarations
+
+identifier_list ::= identifier | identifier identifier_list_aux;
+identifier_list_aux ::= | COMMA identifier_list;
+identifier_list_aux_2 ::= | identifier_list;
+
+// Qualified identifier
+
+qualified_identifier ::= package_name DOT identifier;
+
+
+

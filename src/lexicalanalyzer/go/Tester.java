@@ -17,6 +17,8 @@ public class Tester {
 		} catch (Exception e) {
 			/* do cleanup here -- possibly rethrow e */
 			e.printStackTrace();
+			System.exit(1);
+			
 		}
 		System.out.println("Programa Sintaticamente Compilado!");
 	}

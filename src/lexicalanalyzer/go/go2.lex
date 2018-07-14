@@ -39,16 +39,15 @@ Identifier = [:jletter:][:jletterdigit:]*
 
 comentario = "/*" [^*] ~"*/" | "/*" "*"+ "/" | "//" [^\r\n]* {LineTerminator}? |  "/*" "*"+ [^/*] ~"*/"
 
-decIntLiteral = 0 | [1-9][0-9]*
-decLongLiteral    = {decIntLiteral} [lL]
+imaginaryLiteral = i
+decIntLiteral = 0 | [0-9][0-9]*
 hexIntLiteral = 0 [xX] 0* [0-9a-fA-F] {1,8}
-hexLongLiteral    = 0 [xX] 0* [0-9a-fA-F] {1,16} [lL]
 octIntLiteral = 0+ [1-3]? [0-7] {1,15}
-octLongLiteral    = 0+ 1? [0-7] {1,21} [lL]
+octLongLiteral = 0+ 1? [0-7] {1,21} [lL]
+stringLiteral = \".*\" | \`.*\`
 
-floatLiteral  = ([0-9]+ \. [0-9]*
-		|\. [0-9]+
-		|[0-9]+) [eE] [+-]? [0-9]+?
+floatLiteral = [+-]?([0-9]*[.])?[0-9]+
+//floatLiteral = ([0-9]+ \. [0-9]* |\. [0-9]+ |[0-9]+) [eE] [+-]? [0-9]+?
 
 %state STRING
 
@@ -106,7 +105,7 @@ floatLiteral  = ([0-9]+ \. [0-9]*
   "float32"       {return symbol(sym.FLOAT32, new String(yytext())); }
   "float64"       {return symbol(sym.FLOAT64, new String(yytext()));}
   "complex64"     {return symbol(sym.COMPLEX64, new String(yytext()));}
-  "complex128"     {return symbol(sym.COMPLEX128, new String(yytext()));}
+  "complex128"    {return symbol(sym.COMPLEX128, new String(yytext()));}
   
   /* Literais booleanos */
   
@@ -162,20 +161,17 @@ floatLiteral  = ([0-9]+ \. [0-9]*
   "_"             {return symbol(sym.UNDERSCORE, new String(yytext())); }
   "\""            {return symbol(sym.QUOTE, new String(yytext())); }
   "..."           {return symbol(sym.SUSPOINTS, new String(yytext())); }
-  /* "&^" */
-  /* "&^=" */
-  /* "<-" */
-  /* ":=" */
+  "&^"            {return symbol(sym.ANDNOT, new String(yytext())); }
+  "&^="           {return symbol(sym.ANDNOTEQ, new String(yytext())); }
+  "<-"            {return symbol(sym.CHANNEL, new String(yytext())); }
+  ":="            {return symbol(sym.DECEQ, new String(yytext())); }
 
   {decIntLiteral}           { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
-  {decLongLiteral}          { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
-  {hexIntLiteral}           { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
-  {hexLongLiteral}          { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
-  {octIntLiteral}           { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
-  {octLongLiteral}          { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
+  {hexIntLiteral}           { return symbol(sym.HEXAL_LITERAL, new String(yytext())); }
+  {octIntLiteral}           { return symbol(sym.OCTAL_LITERAL, new String(yytext())); }
   {floatLiteral}            { return symbol(sym.FLOAT_LITERAL, new String(yytext()));}
-  {floatLiteral}[fF]        { return symbol(sym.FLOAT_LITERAL, new String(yytext())); }  
-  {floatLiteral}[dD]        { return symbol(sym.FLOAT_LITERAL, new String(yytext())); }  
+  {imaginaryLiteral}        { return symbol(sym.IMAGINARY_LITERAL, new String(yytext()));}
+  {stringLiteral}           { return symbol(sym.ALL_STRINGS_LITERAL, new String(yytext()));}
 
   /* Definicao de espaco em branco, id, numero e comentario */
 

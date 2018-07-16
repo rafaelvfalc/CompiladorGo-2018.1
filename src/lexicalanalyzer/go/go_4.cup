@@ -1,0 +1,170 @@
+package lexicalanalyzer.go;
+
+import java_cup.runtime.*;
+
+parser code {:
+
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+			
+            if (s.left  == 0) {
+                m.append(" in line "+(s.left));
+                if (s.right  == 0)
+                    m.append(", column "+(s.right));
+            }
+        }
+
+        m.append(" : "+message);
+
+        /* Print the contents of the StringBuilder 'm', which contains
+           an error message, out on a line. */
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+
+// Terminais
+
+terminal BREAK, CASE, CHAN, CONST, CONTINUE, DEFAULT;
+terminal DEFER, ELSE, FALLTHROUGH, FOR, FUNC, GO, GOTO;
+terminal IF, IMPORT, INTERFACE, MAP, PACKAGE, RANGE, RETURN;
+terminal SELECT, STRUCT, SWITCH, TYPE, VAR, BOOL;
+terminal STRING, INT, INT8, INT16, INT32, INT64;
+terminal UINT, UINT8, UINT16, UINT32, UINT64, UINTPTR;
+terminal BYTE, RUNE, FLOAT32, FLOAT64, COMPLEX64;
+terminal COMPLEX128, TRUE, FALSE, LPAREN, RPAREN;
+terminal LBRACE, RBRACE, LBRACK, RBRACK, SEMICOLON;
+terminal COMMA, DOT, COLON, EQUAL, GREATER, LESS;
+terminal NOT, EQEQ, LTEQ, GTEQ, NOTEQ, ANDAND, OROR;
+terminal PLUSPLUS, MINUSMINUS, PLUS, MINUS, MULT, DIV;
+terminal AND, OR, XOR, MOD, LSHIFT, RSHIFT, PLUSEQ;
+terminal MINUSEQ, MULTEQ, DIVEQ, ANDEQ, OREQ, XOREQ;
+terminal MODEQ, LSHIFTEQ, RSHIFTEQ, ID, NUMERO, COMENTARIO;
+terminal STRING_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL;
+terminal HEXAL_LITERAL, OCTAL_LITERAL, CHANNEL, DECEQ; 
+terminal UNDERSCORE, QUOTE, SUSPOINTS, ANDNOT, ANDNOTEQ;
+terminal IMAGINARY_LITERAL, ALL_STRINGS_LITERAL;
+
+
+// Nao terminais
+
+non terminal compilation_unit, package_clause_aux, package_clause, package_name, identifier, import_decl, import_decl_aux;
+non terminal import_decl_e, import_decl_e_aux, import_decl_1, import_decl_1_aux, identifier_e, import_decl_e_1, import_decl_e_aux_1;
+non terminal function_clause, function_name, parameters, block, function_clause_e, function_clause_aux, types, signature, parameters_aux;
+non terminal result, variable_name, parameters_aux_1, types_e, assign_op, assignment, assignment_aux_e, assignment_aux_e_1;
+non terminal assignment_aux, left_side_assignment, array_indexed, index, seq_variables, seq_array_indexed, optional_var;
+non terminal optional_types, right_side_assignment, seq_variables_1, seq_integers_literal, optional_const, expression;
+non terminal boolean_op, boolean_expression, if_statement, if_statement_aux, if_statement_aux_e, statements, optional_else_if;
+non terminal optional_else, optional_section, optional_else_if_aux;
+
+compilation_unit ::= package_clause_aux:p import_decl_e_aux:i function_clause_aux
+                                {:if(p != null && i != null){
+                                     System.out.println("PACKAGE RECONIZED: "+ p + "   IMPORT RECONIZED: "+i);
+                                }else if(p== null &&  i != null){
+                                     System.out.println("IMPORT RECONIZED: "+ i) ;
+                                }else if(p != null &&  i == null){
+                                     System.out.println("PACKAGE RECONIZED: "+ p );
+                               };:};
+
+// Identifier
+
+identifier ::= ID;
+
+// Package clause
+
+package_clause_aux ::= package_clause;
+package_clause ::= PACKAGE package_name;
+package_name ::= identifier;
+
+// Import clause
+
+import_decl_e_aux ::= | import_decl_e_aux_1;
+import_decl_e_aux_1 ::= import_decl_e | import_decl_e_1 | import_decl_e import_decl_e_1 | import_decl_e_1 import_decl_e;
+import_decl_e ::= import_decl | import_decl_e import_decl;
+import_decl_e_1 ::= import_decl_1 | import_decl_e_1 import_decl_1;
+import_decl ::= IMPORT import_decl_aux;
+import_decl_aux ::= ALL_STRINGS_LITERAL | package_name ALL_STRINGS_LITERAL | DOT ALL_STRINGS_LITERAL | UNDERSCORE ALL_STRINGS_LITERAL;
+import_decl_1 ::= IMPORT LPAREN import_decl_1_aux RPAREN;
+import_decl_1_aux ::= | identifier_e;
+identifier_e ::= ALL_STRINGS_LITERAL | identifier_e ALL_STRINGS_LITERAL;
+
+// Function clause
+
+function_clause_aux ::=  | function_clause_e;
+function_clause_e ::= function_clause | function_clause_e function_clause;
+function_clause ::= FUNC function_name signature block;
+function_name ::= identifier;
+signature ::= parameters result;
+result ::= | types | LPAREN types_e RPAREN;
+types_e ::= types | identifier types | types_e COMMA types | types_e COMMA identifier types;
+parameters ::= LPAREN parameters_aux_1 RPAREN;
+parameters_aux_1 ::= parameters_aux | parameters_aux_1 COMMA parameters_aux;
+parameters_aux ::= | variable_name | variable_name types | variable_name SUSPOINTS types;
+variable_name ::= identifier;
+
+// Block
+
+// Add assignment_aux_e_1 to rule bellow
+block ::= LBRACE statements RBRACE;
+statements ::= | assignment_aux_e_1 | if_statement_aux_e;
+assignment_aux_e_1 ::= assignment_aux_e;
+assignment_aux_e ::= assignment_aux | assignment_aux_e assignment_aux;
+if_statement_aux_e ::= if_statement_aux;
+if_statement_aux ::= if_statement | if_statement_aux if_statement;
+
+// Types
+
+types ::= BOOL | STRING | INT | INT8 | INT16 | INT32 | INT64 | UINT | UINT8 | UINT16 | UINT32 | UINT64 | UINTPTR | BYTE | RUNE | FLOAT32 | FLOAT64 | COMPLEX64 | COMPLEX128 | INTERFACE LBRACE RBRACE | identifier | LBRACK RBRACK types | MULT types;
+
+// Assignment
+
+assignment_aux ::= assignment;
+assignment ::= optional_var optional_const left_side_assignment assign_op right_side_assignment;
+assign_op ::= EQUAL | PLUSEQ | MINUSEQ | MULTEQ | DIVEQ | ANDEQ | OREQ | XOREQ | MODEQ | LSHIFTEQ | RSHIFTEQ | ANDNOTEQ | DECEQ;
+left_side_assignment ::= MULT variable_name optional_types | seq_array_indexed optional_types  | LPAREN variable_name RPAREN optional_types | IMAGINARY_LITERAL optional_types | seq_variables | UNDERSCORE;
+seq_variables ::= variable_name optional_types | seq_variables COMMA variable_name;
+optional_var ::= | VAR;
+optional_const ::= | CONST;
+optional_types ::= | types;
+// ADD EXPRESSION TO RULE BELLOW
+right_side_assignment ::= seq_integers_literal | seq_variables_1  | ALL_STRINGS_LITERAL | seq_array_indexed;
+seq_integers_literal ::= INTEGER_LITERAL | seq_integers_literal COMMA INTEGER_LITERAL;
+seq_variables_1 ::= variable_name | seq_variables_1 COMMA variable_name;
+
+// Array
+
+seq_array_indexed ::= array_indexed | seq_array_indexed COMMA array_indexed;
+array_indexed ::= variable_name LBRACK index RBRACK;
+// ADD EXPRESSION TO RULE BELLOW
+index ::= INTEGER_LITERAL | variable_name | IMAGINARY_LITERAL;
+
+// Expression
+// TODO
+expression ::= variable_name | INTEGER_LITERAL;
+
+// Boolean expression
+
+boolean_expression ::= expression boolean_op expression;
+boolean_op ::= EQUAL | NOTEQ | LESS | LTEQ | GREATER | GTEQ | EQEQ;
+
+// IF Statement
+
+if_statement ::= IF boolean_expression block optional_section;
+optional_section ::= | optional_else_if_aux | optional_else_if_aux optional_else | optional_else;
+optional_else_if_aux ::= optional_else_if | optional_else_if_aux optional_else_if;
+optional_else_if ::= ELSE IF boolean_expression block;
+optional_else ::= ELSE block;
+
+
+
+
+
+
+

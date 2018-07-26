@@ -1,438 +1,473 @@
-package lexicalanalyzer.go;
-
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.*;
+
+import semanticanalyzer.go.*;
+import semanticanalyzer.go.objects.*;
 
 parser code {:
 
     public void report_error(String message, Object info) {
-        StringBuilder m = new StringBuilder("Error");
+        StringBuffer m = new StringBuffer("Syntax error: ");
 
-        if (info instanceof java_cup.runtime.Symbol) {
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-
-            if (s.left  == 0) {
-                m.append(" in line "+(s.left));
-                if (s.right  == 0)
-                    m.append(", column "+(s.right));
-            }
+        if (info instanceof ComplexSymbol) {
+            ComplexSymbol s = (ComplexSymbol) info;
+            if(s.value != null) m.append( s.value.toString() );
+            m.append( " - Line: " + s.getLeft().getLine() + " - Column: " + s.getLeft().getColumn() );
         }
 
-        m.append(" : "+message);
+        m.append(" : " + message);
 
-        /* Print the contents of the StringBuilder 'm', which contains
-           an error message, out on a line. */
         System.err.println(m);
     }
 
     public void report_fatal_error(String message, Object info) {
-        report_error(message, info);
-        System.exit(1);
+        System.out.println("Error - " + message);
+        System.exit(-1);
     }
 :};
 
-// Terminais
 
-terminal BREAK, CASE, CHAN, CONST, CONTINUE, DEFAULT;
-terminal DEFER, ELSE, FALLTHROUGH, FOR, FUNC, GO, GOTO;
-terminal IF, IMPORT, INTERFACE, MAP, PACKAGE, RANGE, RETURN;
-terminal SELECT, STRUCT, SWITCH, TYPE, VAR, BOOL;
-terminal STRING, INT, INT8, INT16, INT32, INT64;
-terminal UINT, UINT8, UINT16, UINT32, UINT64, UINTPTR;
-terminal BYTE, RUNE, FLOAT32, FLOAT64, COMPLEX64;
-terminal COMPLEX128, TRUE, FALSE, LPAREN, RPAREN;
-terminal LBRACE, RBRACE, LBRACK, RBRACK, SEMICOLON;
-terminal COMMA, DOT, COLON, EQUAL, GREATER, LESS;
-terminal NOT, EQEQ, LTEQ, GTEQ, NOTEQ, ANDAND, OROR;
-terminal PLUSPLUS, MINUSMINUS, PLUS, MINUS, MULT, DIV;
-terminal AND, OR, XOR, MOD, LSHIFT, RSHIFT, PLUSEQ;
-terminal MINUSEQ, MULTEQ, DIVEQ, ANDEQ, OREQ, XOREQ;
-terminal MODEQ, LSHIFTEQ, RSHIFTEQ, ID, NUMERO, COMENTARIO;
-terminal a , b , c , d , e , f , A , B , C , D , E , F, x; 
-terminal X, l, input_character, escape_character, except; 
-terminal STRING_LITERAL, INTEGER_LITERAL, FLOAT_LITERAL;
-terminal UNDERSCORE;
+// Terminals
 
-// Nao terminais TO-DO
+terminal GO, MAP, STRUCT, TRUE, FALSE, BREAK, DEFAULT, SELECT, CONST, FALLTHROUGH, CASE, DEFER;
+terminal IF, RANGE, TYPE, GOTO, IMPORT, RETURN, VAR, FUNC, INTERFACE, PACKAGE, SWITCH, CONTINUE;
+terminal CHAN, ELSE, FOR, MOD, NOT, MINUS, OR, NOTEQ, OROR, CHANNEL, LSHIFTEQ, EQUAL, CHANNELEQ;
+terminal LESS, PLUSEQ, MULT, XOR, GREATER, GTEQ, LTEQ, ANDEQ, MINUSEQ, DIV, PLUS, LSHIFT, PLUSPLUS;
+terminal RSHIFT, MINUSMINUS, ANDNOT, RSHIFTEQ, AND, ANDAND, OREQ, MULTEQ, DIVEQ, ANDNOTEQ, EQEQ;
+terminal COMMA, SEMICOLON, SUSPOINTS, DOT, COLON, LPAREN, RPAREN, LBRACK, RBRACK, LBRACE, RBRACE;
+terminal INTERROGATION, HASH, DOUBLE_INTERROGATION, INT_LITERAL, FLOAT_LITERAL, IMG_LITERAL, RUNE_LITERAL;
+terminal STRING_LITERAL, BLANK_IDENTIFIER, IDENTIFIER, XOREQ;
 
-non terminal letter, float_lit, decimals, exponent, e_exponent, plus_or_minus, string_lit, string_characters, string_character;
-non terminal type, type_name, package_name, qualified_ident, type_lit, array_type, struct_type, pointer_type, function_type;
-non terminal interface_type, slice_type, map_type, channel_type, array_length, element_type, expression;
-non terminal unary_expr, binary_op, primary_expr, unary_op, rel_op, add_op, mul_op, identifier_list, embedded_field, tag;
-non terminal field_decl, field_decl_2, tag_2, mult_2, base_type, signature, parameters, comma_2, parameter_list_2, result;
-non terminal result_2, parameter_list, parameter_decl, identifier_list_2, method_spec, method_name, interface_type_name;
-non terminal key_type, block, statement_list, statement, declaration, labeled_stmt, simple_stmt, go_stmt, return_stmt;
-non terminal break_stmt, continue_stmt, goto_stmt, fallthrough_stmt, if_stmt, switch_stmt, select_stmt, for_stmt;
-non terminal defer_stmt, empty_stmt, expression_stmt, send_stmt, inc_dec_stmt, assignment, short_var_decl, label;
-non terminal channel, assign_op, expression_list, simple_stmt_2, else_2, expr_switch_stmt, expression_2, expr_case_clause;
-non terminal expr_switch_case, mul_op_2, add_op_2, type_switch_stmt, type_switch_guard, type_case_clause, id_2;
-non terminal type_switch_case, type_list, condition, for_clause, init_stmt, post_stmt, init_stmt_2, condition_2, post_stmt_2;
-non terminal range_clause, expression_list_2, comm_clause, comm_case, recv_stmt, recv_expr, expression_list_3, label_2;
-non terminal condition_3, const_decl, const_spec, type_2, type_3, type_decl, type_spec, alias_decl, type_def, var_spec;
-non terminal var_decl, equal_2, function_decl, function_name, function_body, function_body_2, method_decl, receiver;
-non terminal top_level_decl, operand, literal, basic_lit, decimal_lit, int_lit, composite_lit, literal_type, literal_value;
-non terminal comma_1, element_list_1, element_list, keyed_element, key_2, element, key, field_name, operand_name, function_lit;
-non terminal conversion, receiver_type, method_expr, selector, index, slice, type_assertion, comma_3, expression_list_4, arguments;
-non terminal package_clause, import_path, dot_2, import_spec, import_decl, source_file, compilation_unit, package_clause_aux;
-non terminal identifier, import_decl_e, import_decl_aux;
+// Non Terminals
+non terminal struct_type, field_decl, field_decl_star1, embedded_field, embedded_field_1, embedded_field_2, type, type_lit;
+non terminal type_no_identifier, type_name, aux_type_name_1, type_name_no_par, element_type, pointer_type, base_type, function_type;
+non terminal interface_type, map_type, slice_type, key_type, channel_type, array_length, array_type, signature, result;
+non terminal parameters, parameter_list, parameter_decl, parameter_decl_star, func_identifier_list, func_identifier_list_aux_1;
+non terminal identifier_list_param, identifier_star_2, identifier_star_3, identifier_star_4, method_spec, method_spec_aux_1;
+non terminal method_spec_aux_2, opt_mul, opt_comma, opt_identifier_list, opt_identifier, opt_ellipsis_comma, aux_field_decl_1;
+non terminal aux_field_decl_2, aux_field_decl_3, aux_field_decl_4, identifier_star_1, aux_parameters_1, aux_parameters_2, aux_parameter_list_3;
+non terminal aux_parameter_list_1, aux_parameter_list_2, aux_inteface_type_1, aux_channel_type_1, aux_result, aux_result_2, aux_result_3;
+non terminal basic_lit, composite_lit, function_lit, boolean_lit, composite_lit_incomplete, literal_type_incomplete, unary_op;
+non terminal mul_op, add_op, rel_op, bin_op, expression, expression_list, unary_expr, primary_expr, or_expression, and_expression;
+non terminal relop_expression, mul_expression, add_expression, x, y, conversion, next_conversion, type_conv, opt_dot_identifier;
+non terminal dot_identifier, type_name_dot_identifier, aux_type_name_dot_identifier, index, primary_expr_other_options, aux_type_dot_identifier;
+non terminal Index_and_slice, opt_expression, opt_expression_2, possible_close, possible_close_2, possible_close_3, arguments, elementList_aux_1;
+non terminal exp_type_etc, opt_exp_type, opt_comma_exp, Source_file, package_clause, import_decl, import_decl_star, import_decl_aux_1;
+non terminal import_spec, import_spec_star, import_spec_aux_1, declaration, top_level_decl, top_level_decl_star, function_decl, function_body_opt;
+non terminal method_decl, operand, operand_incomplete, literal, literal_type, literal_value, literal_value_aux_1, element;
+non terminal keyed_element, keyed_element_aux_1, keyed_element_aux_2, keyed_element_aux_3, identifier, const_decl, const_spec, tag;
+non terminal aux_const_spec, aux_const_spec_2, aux_const_decl_1, aux_comma_exp, identifier_list_star_aux, identifier_list_star_2, identifier_list;
+non terminal expression_list_star, opt_type, statement, statement_lis, statement_lis_aux, simple_stmt, short_var_decl, element_list;
+non terminal aux_expression,assignment, assign_op, aux_op, type_decl, type_decl_aux, type_spec_aux, type_spec, opt_simple_stmt;
+non terminal opt_assign, opt_assign_exp_list, var_decl, var_decl_aux, var_spec_aux, var_spec_aux_2, var_spec, labeled_stmt, go_stmt, return_stmt;
+non terminal break_stmt, continue_stmt, goto_stmt, fall_through_stmt, block, defer_stmt, select_stmt, comm_clause, comm_case, stmt_opt;
+non terminal recv_stmt, recv_stmt_aux, recv_stmt_aux_2, if_stmt, if_stmt_2, simple_stmt_2, simple_stmt_aux, if_stmt_aux, if_stmt_aux_2;
+non terminal simple_stmt_sc, for_stmt, for_stmt_aux, for_clause, range_clause, simples_stmt_star_aux, range_clause_aux, range_clause_aux_2;
+non terminal switch_stmt, switch_stmt_aux, switch_stmt_aux_2, switch_stmt_sc, expr_case_clause, expr_switch_case, type_switch_guard, type_case_clause;
+non terminal opt_type_switch_guard, type_switch_case, aux_typeList, type_list, type_star, basic_lit_star, expression_star, operand_star, function_type_star;
 
-start with compilation_unit;
+precedence left CHANNEL;
 
-// Compilation Unit
+precedence left OROR;
+precedence left AND;
+precedence left EQEQ, NOTEQ, LESS, LTEQ, GREATER, GTEQ;
+precedence left MULT, DIV, MOD, LSHIFT, RSHIFT, AND, ANDNOT;
+precedence left PLUS, MINUS, OR, XOR;
 
-compilation_unit ::= package_clause_aux:p import_decl_aux:i;				 
+start with Source_file;
 
-// Identifier
 
-identifier ::= ID:id {:RESULT = id;:};
+identifier ::= IDENTIFIER:id          {: RESULT = id;  :}
+               | BLANK_IDENTIFIER:bid {: RESULT = bid; :};
 
-// Floating-point literals
+// OPERATIONS
+basic_lit_star ::= basic_lit basic_lit_star |;
 
-decimals ::= NUMERO;
-e_exponent ::= e | E;
-plus_or_minus ::= PLUS | MINUS;
-exponent ::= e_exponent plus_or_minus decimals;
+basic_lit     ::= INT_LITERAL:i      {: Expression intLit = new Expression(Type.INT, i.toString());       RESULT = intLit;    :}
+                 | FLOAT_LITERAL:f  {: Expression floatLit = new Expression(Type.FLOAT32, f.toString()); RESULT = floatLit;  :}
+                 | IMG_LITERAL
+                 | RUNE_LITERAL
+                 | STRING_LITERAL:s {: Expression stringLit = new Expression(Type.STRING, s.toString()); RESULT = stringLit; :};
 
-// Integer Literals
-// Conferir com Franklin se precisa adicionar Octal, Hexa
-int_lit ::= decimal_lit;
-decimal_lit ::= decimals { decimals };
+boolean_lit ::= TRUE:t               {: Expression trueLit = new Expression(Type.BOOL, t.toString());  RESULT = trueLit;       :}
+            | FALSE:f            {: Expression falseLit = new Expression(Type.BOOL, f.toString()); RESULT = falseLit;      :};
 
-// Checar regra abaixo
-float_lit ::= decimals DOT decimals exponent | decimals exponent | DOT decimals exponent;
+unary_op  ::= PLUS:plus         {: RESULT = plus;  :} 
+   | MINUS:minus      {: RESULT = minus; :}
+   | NOT:not          {: RESULT = not;   :}
+   | XOR:xor          {: RESULT = xor;   :}
+   | MULT:mul          {: RESULT = mul;   :}
+   | AND:addr     {: RESULT = addr;  :}
+   | CHANNEL:cop   {: RESULT = cop;   :};
+   
+mul_op    ::= MULT:mul           {: RESULT = mul;  :}
+             | DIV:div         {: RESULT = div;  :}
+             | MOD:mod         {: RESULT = mod;  :}
+             | LSHIFT:lop     {: RESULT = lop;  :}
+             | RSHIFT:rop    {: RESULT = rop;  :}
+             | AND:addr    {: RESULT = addr; :}
+             | ANDNOT:anop {: RESULT = anop; :};
 
-// String literals (Checar se funciona)
+add_op    ::= PLUS:plus         {: RESULT = plus;  :}
+             | MINUS:minus     {: RESULT = minus; :}
+             | OR:or           {: RESULT = or;    :}
+             | XOR:xor         {: RESULT = xor;   :};
 
-string_lit ::= "string_characters" | `string_characters`;
-string_characters ::= string_character | string_characters string_character |;
-string_character ::= input_character except " AND \ | escape_character;
+rel_op    ::= EQEQ:eqop        {: RESULT = eqop;  :}
+            | NOTEQ:neop       {: RESULT = neop;  :}
+            | LESS:lt            {: RESULT = lt;    :}
+            | LTEQ:let          {: RESULT = let;   :}
+            | GREATER:gt            {: RESULT = gt;    :}
+            | GTEQ:gte          {: RESULT = gte;   :};
+bin_op    ::= OROR:orop        {: RESULT = orop;  :}
+             | AND:and         {: RESULT = and;   :}
+             | rel_op:relop     {: RESULT = relop; :}
+             | add_op:addop     {: RESULT = addop; :}
+             | mul_op:mulop     {: RESULT = mulop; :};
 
-// Types
+/* --------------- Composite literal------------ */
+composite_lit     ::= literal_type literal_value;
+literal_type      ::= struct_type | array_type | LBRACK SUSPOINTS RBRACK element_type | slice_type | map_type | type_name;
+literal_value     ::= LBRACE literal_value_aux_1 RBRACE;
+literal_value_aux_1::= element_list |;
 
-type ::= type_name | type_lit | LPAREN type RPAREN;
-type_name ::= ID | qualified_ident;
-type_lit ::= array_type | struct_type | pointer_type | function_type | interface_type | slice_type | map_type | channel_type;
+element_list      ::= keyed_element elementList_aux_1 opt_comma;
+elementList_aux_1  ::= elementList_aux_1 COMMA keyed_element |;
 
-// Array Types
+keyed_element     ::= keyed_element_aux_1 keyed_element_aux_2;
+keyed_element_aux_1 ::= expression | literal_value;
+keyed_element_aux_2 ::= keyed_element_aux_3 |;
+keyed_element_aux_3 ::= COLON element;
 
-array_type ::= LBRACK array_length RBRACK element_type;
-array_length ::= expression;
-element_type ::= type;
+element          ::= expression | literal_value;
 
-// Slice types
 
-slice_type ::= LBRACK  RBRACK element_type;
+// FUNCTION LITERAL
+function_lit ::= FUNC signature block;
 
-// Struct types
+// SOURCE AND IMPORT
+Source_file ::= package_clause SEMICOLON import_decl_star top_level_decl_star;
 
-struct_type ::= STRUCT LBRACE { field_decl SEMICOLON } RBRACE;
-// Checar se esta certo
-field_decl ::= field_decl_2 tag_2;
-field_decl_2 ::= identifier_list type | embedded_field;
-tag_2 ::= tag | ;
-embedded_field ::= mult_2 type_name;
-mult_2 ::= MULT | ;
-tag ::= string_lit;
+import_decl_star ::= import_decl SEMICOLON import_decl_star |;
+import_decl ::= IMPORT import_decl_aux_1;
+import_decl_aux_1 ::= import_spec | LPAREN import_spec_star RPAREN;
+import_spec_star ::= import_spec SEMICOLON import_spec_star |;
 
-// Pointer types
+import_spec ::= import_spec_aux_1 STRING_LITERAL;
+import_spec_aux_1 ::= DOT | IDENTIFIER |;
 
-pointer_type ::= MULT base_type;
-base_type ::= type;
+package_clause ::= PACKAGE IDENTIFIER;
 
-// Function types
+// OPERAND
+operand_star    ::= operand_star operand |;
+operand        ::= literal:lit                 {: RESULT = lit;  :}
+                   | type_name:tn               {: Expression expTn = new Expression(Type.UNKNOWN, tn.toString(), tn.toString()); RESULT = expTn;  :}
+                   | LPAREN expression:e RPAREN  {: Expression exp = (Expression) e;
+              exp.setValue("(" + exp.getValue() + ")");
+              RESULT = exp; :};
 
-function_type ::= FUNC signature;
-signature ::= parameters result_2;
-result ::= parameters | type;
-result_2 ::= result | ; 
-parameters ::= LPAREN parameter_list_2 RPAREN;
-parameter_list_2 ::= parameter_list | comma_2;
-comma_2 ::= COMMA | ;
-parameter_list ::= parameter_decl { COMMA parameter_decl };
-// LEMBRAR: adicionar "..." abaixo
-parameter_decl ::= identifier_list_2 type;
-identifier_list_2 ::= identifier_list | ;
+literal        ::= basic_lit:blit               {: RESULT = blit; :}
+       | function_lit
+                   | boolean_lit:bolit          {: RESULT = bolit; :};
+ 
+// EXPRESSION
+unary_expr      ::= primary_expr:pexp                      {: RESULT = pexp; :}
+                   | unary_op:uop unary_expr:uexpr         {: RESULT = Semantic.getInstance().calculateUnaryExpr(uop.toString(), (Expression) uexpr); :};
+ 
+primary_expr    ::= operand:op                                 {: RESULT = op;   :}
+                   | conversion                               {: RESULT = "";   :}
+                   | primary_expr:pexp primary_expr_other_options {: RESULT = pexp;  Semantic.getInstance().FunctionCheckParameters((Expression)pexp);  :};  // Obs: Missing MethodExpr
 
-// Interface Types
+expression     ::= or_expression:orexp                              {: RESULT = orexp; :};
 
-interface_type ::= INTERFACE LBRACE { method_spec SEMICOLON } RBRACE;
-method_spec ::= method_name signature | interface_type_name;
-method_name ::= ID;
-interface_type_name ::= type_name;
+or_expression ::= or_expression:e1 OROR:op and_expression:e2         {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
+     | and_expression:aexpr                             {: RESULT = aexpr; :};
 
-// Map types
+and_expression ::= and_expression:e1 AND:op relop_expression:e2       {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
+      | relop_expression:rexpr                          {: RESULT = rexpr; :};
 
-map_type ::= MAP LBRACK key_type RBRACK element_type;
-key_type ::= type;
+relop_expression ::= relop_expression:e1 rel_op:op add_expression:e2   {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
+      | add_expression:aexpr                            {: RESULT = aexpr; :};
+add_expression ::= add_expression:e1 add_op:op mul_expression:e2       {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
+                  | mul_expression:mulexp                           {: RESULT = mulexp; :};
 
-// Channel types
-// LEMBRAR: Adicionar "<-" na regra abaixo
-channel_type ::= CHAN element_type;
+mul_expression ::= mul_expression:e1 mul_op:op unary_expr:e2           {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
+                  | unary_expr:uexpr                                {: RESULT = uexpr; :};
 
-// Blocks
 
-block ::= LBRACE statement_list RBRACE;
-statement_list ::= { statement SEMICOLON };
+// SLICE, INDEX AND ARGUMENTS
+primary_expr_other_options ::= Index_and_slice
+       | arguments 
+       | HASH DOT LPAREN type RPAREN;
 
-// Declarations and scope
+arguments      ::= HASH LPAREN exp_type_etc RPAREN;
+exp_type_etc     ::= opt_exp_type opt_ellipsis_comma |;
 
-declaration ::= const_decl | type_decl | var_decl;
+opt_exp_type     ::= expression_list
+                   | type_lit opt_comma_exp;
+
+opt_comma_exp    ::= COMMA expression_list |;
+
+Index_and_slice  ::= LBRACK expression possible_close | LBRACK possible_close_2;
+possible_close  ::= RBRACK | COLON opt_expression RBRACK;
+possible_close_2 ::= COLON RBRACK | COLON expression possible_close_3;
+possible_close_3 ::= COLON expression RBRACK | RBRACK;
+
+opt_ellipsis_comma    ::= SUSPOINTS | SUSPOINTS COMMA | ;
+
+opt_expression  ::= expression |;
+opt_expression_2 ::= RBRACK | COLON opt_expression; 
+index ::= LBRACK expression RBRACK;
+
+expression_list ::= expression:exp expression_star:exps         {: Semantic.getInstance().addExpression((Expression) exp); RESULT = exp; :} ;
+expression_star ::= COMMA:c expression:exp expression_star:exps {: Semantic.getInstance().addExpression((Expression) exp); RESULT = exp; :}
+                   |;
+
+conversion     ::= type_conv next_conversion;
+next_conversion ::= LPAREN expression opt_comma RPAREN;
+
+type_conv ::= type_name | type_lit | INTERROGATION type_conv INTERROGATION;
+
+opt_dot_identifier ::= DOT IDENTIFIER | ;
+
+// CONST
+const_decl     ::= CONST aux_const_decl_1;
+aux_const_decl_1 ::= const_spec | LPAREN aux_const_spec RPAREN;
+
+const_spec     ::= identifier_list_star_2 aux_const_spec_2;
+aux_const_spec  ::= aux_const_spec const_spec SEMICOLON  | ;
+
+aux_comma_exp   ::= aux_comma_exp COMMA expression | ;
+opt_type       ::= type  | ;
+
+aux_const_spec_2          ::= opt_type EQUAL expression_list | ;
+identifier_list_star_aux ::= identifier_list_star_aux COMMA IDENTIFIER:id {: Semantic.getInstance().addVarName(id.toString()); :}
+                          |;
+identifier_list_star_2   ::= IDENTIFIER:id {: Semantic.getInstance().addVarName(id.toString()); :} identifier_list_star_aux;
+
+
+// STATEMENT
+statement ::= declaration | labeled_stmt | simple_stmt | go_stmt | return_stmt | 
+              break_stmt | continue_stmt | goto_stmt | fall_through_stmt | block | 
+              if_stmt | select_stmt | switch_stmt | defer_stmt | for_stmt;
+
+// DECLARATION
+top_level_decl_star ::= top_level_decl SEMICOLON top_level_decl_star |;
 top_level_decl ::= declaration | function_decl | method_decl;
 
-// Constant declarations
+function_decl ::= FUNC IDENTIFIER:id  {: Semantic.getInstance().createNewFunction(id.toString()); :} signature function_body_opt;
+function_body_opt ::= block {: Semantic.getInstance().exitCurrentScope(); :} 
+                    |;
 
-const_decl ::= CONST ( const_spec | LPAREN { const_spec SEMICOLON } RPAREN );
-const_spec ::= identifier_list type_3;
-type_2 ::= type | ;
-type_3 ::= type_2 | EQUAL | expression_list;
+method_decl ::= FUNC parameters IDENTIFIER signature function_body_opt;
+declaration ::= const_decl | type_decl | var_decl;
 
-identifier_list ::= ID { COMMA ID };
-expression_list ::= expression { COMMA expression };
+type_decl      ::= TYPE type_decl_aux;
+type_decl_aux   ::= type_spec | LPAREN type_spec_aux RPAREN;
+type_spec_aux   ::= type_spec_aux type_spec SEMICOLON | ;
+type_spec      ::= IDENTIFIER opt_assign type ;
 
-// Type declarations
+var_decl       ::= VAR var_decl_aux;
+var_decl_aux    ::= var_spec | LPAREN var_spec_aux RPAREN;
+var_spec_aux    ::= var_spec_aux var_spec SEMICOLON | ;
+var_spec       ::= identifier_list_star_2 var_spec_aux_2 {: Semantic.getInstance().printVars(); :};
+var_spec_aux_2   ::= type :t opt_assign_exp_list:optAss  {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().initializeVars(type, optAss.toString()); :}
+                  | EQUAL expression_list:epl;
 
-type_decl ::= TYPE ( type_spec | LPAREN { type_spec SEMICOLON } RPAREN );
-type_spec ::= alias_decl | type_def;
+// LABELLED STATEMENT
+labeled_stmt ::= IDENTIFIER COLON statement;
 
-// Alias declarations
+// SIMPLE STATEMENT
+simple_stmt ::= expression aux_expression | assignment | INTERROGATION short_var_decl |;  // HOT FIX INTERROGATION
+aux_expression ::= CHANNEL expression | PLUSPLUS | MINUSMINUS | PLUS PLUS | MINUS MINUS | ;
 
-alias_decl ::= ID EQUAL type;
 
-// Type definitions
+assignment ::= expression_list:el1 assign_op:ass {: Semantic.getInstance().transferExpBuffer();  :} expression_list:el2 {: Semantic.getInstance().updateVars(ass.toString());  :};
 
-type_def ::= ID type;
+assign_op ::= MULTEQ:ma         {: RESULT = ma;     :}
+    | PLUSEQ:aa       {: RESULT = aa;     :}
+    | XOREQ:xa       {: RESULT = xa;     :}
+    | DIVEQ:da       {: RESULT = da;     :}
+    | LSHIFTEQ:la      {: RESULT = la;     :}
+    | RSHIFTEQ:ra     {: RESULT = ra;:}
+    | ANDNOTEQ:ana  {: RESULT = ana;    :}
+    | MINUSEQ:minusa {: RESULT = minusa; :}
+    | ANDEQ:adda {: RESULT = adda;   :}
+    | EQUAL:a            {: RESULT = a;      :}; // Missing other types of assignment
 
-// Variable declarations
+short_var_decl ::=  identifier_list CHANNELEQ expression_list;
 
-var_decl ::= VAR ( var_spec | LPAREN { var_spec SEMICOLON } RPAREN );
-var_spec ::= identifier_list ( type equal_2 | EQUAL expression_list );
-equal_2 ::= EQUAL | expression_list | ; 
+statement_lis ::= statement SEMICOLON statement_lis | ;
+block ::= LBRACE statement_lis RBRACE;
 
-// Short variable declarations
-// Lembrar: Adicionar ":=" a essa regra
-short_var_decl ::= identifier_list expression_list;
 
-// Function declarations
+// FOR STATEMENT
+for_stmt ::= FOR for_stmt_aux block;
+for_stmt_aux ::= expression | for_clause | range_clause |;
+for_clause ::= simple_stmt SEMICOLON opt_expression SEMICOLON simple_stmt;
 
-function_decl ::= FUNC function_name signature function_body_2 ;
-function_body_2 ::= function_body | ;
-function_name ::= ID;
-function_body ::= block;
+simples_stmt_star_aux  ::= CHANNEL expression | PLUSPLUS | MINUSMINUS | aux_comma_exp assign_op expression_list;
+range_clause_aux      ::= expression_list range_clause_aux_2 | ;
+range_clause_aux_2     ::= EQUAL | CHANNELEQ;
+range_clause         ::= range_clause_aux RANGE expression;
 
-// Method declarations
 
-method_decl ::= FUNC receiver method_name signature function_body_2 ;
-receiver ::= parameters;
+// SWITCH STATEMENT
+switch_stmt ::= SWITCH switch_stmt_aux;
 
-// Operands
+switch_stmt_aux ::= simple_stmt_sc switch_stmt_aux_2;
+simple_stmt_sc ::= simple_stmt SEMICOLON | HASH;
 
-operand ::= literal | operand_name | LPAREN expression RPAREN;
-literal ::= basic_lit | composite_lit | function_lit;
-//Lembrar depois de adicionar 'imaginary_lit' e 'rune_lit' na regra abaixo se necessario.
-basic_lit ::= int_lit | float_lit | string_lit;
-operand_name ::= ID | qualified_ident;
-        
-// Qualified identifiers
+switch_stmt_aux_2 ::= opt_expression LBRACE expr_case_clause RBRACE | type_switch_guard LBRACE type_case_clause RBRACE;
+expr_case_clause ::= expr_switch_case COLON statement_lis expr_case_clause |;
 
-qualified_ident ::= package_name DOT ID;
+// HOT FIX HASH
+type_switch_guard    ::= opt_type_switch_guard primary_expr HASH DOT LPAREN TYPE RPAREN;
+opt_type_switch_guard ::= identifier CHANNELEQ | HASH;
 
-// Composite literals
+type_case_clause     ::= type_switch_case COLON statement_lis type_case_clause | ;
+type_switch_case     ::= CASE type_list | DEFAULT;
 
-composite_lit ::= literal_type literal_value;
-// Lembrar de adicionar "..." na regra abaixo
-literal_type ::= struct_type | array_type | LBRACK  RBRACK element_type | slice_type | map_type | type_name;
-literal_value ::= LBRACE element_list_1 RBRACE;
-comma_1 ::= COMMA | ;
-element_list_1 ::= element_list | comma_1;
-element_list ::= keyed_element { COMMA keyed_element };
-keyed_element ::= key_2  element;
-key_2 ::= key | COLON | ;
-key ::= field_name | expression | literal_value;
-field_name ::= ID;
-element ::= expression | literal_value;
+expr_switch_case ::= CASE expression_list | DEFAULT ;
 
-// Function literals
+type_list ::= type  aux_typeList;
+aux_typeList ::= COMMA type  aux_typeList | ;
 
-function_lit ::= FUNC signature function_body;
+// DEFER STATEMENT
+defer_stmt ::= DEFER expression;
 
-// Primary expressions
+// STATEMENT
+if_stmt         ::= IF {: Semantic.getInstance().createIfCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
+simple_stmt_aux  ::= HASH simple_stmt SEMICOLON | ; // HOTFIX HASH
 
-primary_expr ::= operand | conversion | method_expr | primary_expr selector | primary_expr index | primary_expr slice | primary_expr type_assertion | primary_expr arguments;
+if_stmt_2         ::= IF {: Semantic.getInstance().createIfElseCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
 
-selector ::= DOT ID;
-index ::= LBRACK expression RBRACK;
-slice ::= LBRACK expression_2 COLON expression_2 RBRACK | LBRACK expression_2 COLON expression COLON expression RBRACK;
+if_stmt_aux      ::=   ELSE {: Semantic.getInstance().exitCurrentScope(); :} if_stmt_2
+                   | ELSE {: Semantic.getInstance().exitCurrentScope(); Semantic.getInstance().createElseCode(); Semantic.getInstance().createElse(); :} block {: Semantic.getInstance().exitCurrentScopeEndIf(); :}
+       |      {: Semantic.getInstance().exitCurrentScopeEndIf(); :};
+       
+// SELECT STATEMENT
+select_stmt  ::= SELECT LBRACE comm_clause RBRACE;
+comm_clause  ::= comm_case COLON statement_lis comm_clause | ;
+comm_case    ::= CASE stmt_opt | DEFAULT;
+stmt_opt     ::= expression CHANNEL expression | recv_stmt;
+recv_stmt    ::= recv_stmt_aux expression;
+recv_stmt_aux ::= expression_list recv_stmt_aux_2; //FIXME: could be empty, warning: wont fix
+recv_stmt_aux_2 ::= EQUAL | CHANNELEQ;    // Errors in this
 
-type_assertion ::= DOT LPAREN type RPAREN;
-// Lembrar de adicionar "..." na regra abaixo.
-arguments ::= LPAREN expression_list_4 RPAREN;
-comma_3 ::= COMMA | expression_list | ;
-expression_list_4 ::= (expression_list | type comma_3) | comma_2 | ;
+//OTHER STATEMENTS
+opt_identifier ::= identifier |;
+fall_through_stmt ::= FALLTHROUGH;
+goto_stmt ::= GOTO opt_identifier;
+continue_stmt ::= CONTINUE opt_identifier;
+break_stmt ::= BREAK opt_identifier;
 
-// Method expressions
+expression_list_star ::= expression_list:epl {: RESULT = epl;               :}
+        |                  {: RESULT = new Expression();  :};
 
-method_expr ::= receiver_type DOT method_name;
-receiver_type ::= type;
 
-// Operators
-
-expression ::= unary_expr | expression binary_op expression;
-unary_expr ::= primary_expr | unary_op unary_expr;
-
-binary_op ::= OROR | ANDAND | rel_op | add_op | mul_op;
-rel_op ::= EQEQ | NOTEQ | LESS | LTEQ | GREATER | GTEQ;
-add_op ::= PLUS | MINUS | OR | XOR;
-// LEMBRAR: Adicionar "&^" abaixo
-mul_op ::= MULT | DIV | MOD | LSHIFT | RSHIFT | AND;
-
-//LEMBRAR: Adicionar o "<-" abaixo
-unary_op ::= PLUS | MINUS | NOT | XOR | MULT | AND;
-
-// Conversions
-
-conversion ::= type LPAREN expression comma_2 RPAREN;
-
-// Statements
-
-statement ::= declaration | labeled_stmt | simple_stmt | go_stmt | return_stmt | break_stmt | continue_stmt | goto_stmt | fallthrough_stmt | block | if_stmt | switch_stmt | select_stmt | for_stmt | defer_stmt;
-
-simple_stmt ::= empty_stmt | expression_stmt | send_stmt | inc_dec_stmt | assignment | short_var_decl;
-
-// Empty statements
-
-empty_stmt ::= ;
-
-// Labeled statements
-
-labeled_stmt ::= label COLON statement;
-label ::= ID;
-
-// Expression statements
-
-expression_stmt ::= expression;
-
-// Send statements
-// Lembrar: Adicionar "<-" abaixo.
-send_stmt ::= channel expression;
-channel ::= expression;
-
-// IncDec statements
-
-inc_dec_stmt ::= expression ( PLUSPLUS | MINUSMINUS );
-
-// Assignments
-
-assignment ::= expression_list assign_op expression_list;
-
-assign_op ::= add_op_2 EQUAL;
-mul_op_2 ::= mul_op | ;
-add_op_2 ::= add_op | mul_op_2;
-
-// If statements
-
-if_stmt ::= IF simple_stmt_2 expression block else_2;
-simple_stmt_2 ::= simple_stmt | SEMICOLON;
-else_2 ::= ELSE | ( if_stmt | block );
-
-// Switch statements
-
-switch_stmt ::= expr_switch_stmt | type_switch_stmt;
-
-// Expression switches 
-
-expr_switch_stmt ::= SWITCH simple_stmt_2 expression_2 LBRACE { expr_case_clause } RBRACE;
-expression_2 ::= expression | ;
-expr_case_clause ::= expr_switch_case COLON statement_list;
-expr_switch_case ::= CASE expression_list | DEFAULT;
-
-// Type switches
-
-type_switch_stmt ::= SWITCH simple_stmt_2 type_switch_guard LBRACE { type_case_clause } RBRACE;
-// Lembrar: Adicionar ":=" na regra abaixo
-type_switch_guard ::= id_2 primary_expr DOT LPAREN TYPE RPAREN;
-id_2 ::= ID | ;
-type_case_clause ::= type_switch_case COLON statement_list;
-type_switch_case ::= CASE type_list | DEFAULT;
-type_list ::= type { COMMA type };
-
-// For statements
-
-for_stmt ::= FOR condition_3  block;
-condition_3 ::= condition | for_clause | range_clause | ; 
-condition ::= expression;
-
-// For statements with for clause
-
-for_clause ::= init_stmt_2 SEMICOLON condition_2 SEMICOLON post_stmt_2;
-init_stmt_2 ::= init_stmt | ;
-condition_2 ::= condition | ;
-post_stmt_2 ::= post_stmt | ;
-init_stmt ::= simple_stmt;
-post_stmt ::= simple_stmt;
-
-// For statements with range clause
-//Lembrar: Adicionar ":=" na regra abaixo;
-range_clause ::= expression_list_2  RANGE expression;
-expression_list_2 ::= expression_list EQUAL | identifier_list_2 | ;
-
-// Go statements
+// RETURN STATEMENT
+return_stmt ::= RETURN expression_list_star:epls {: Semantic.getInstance().FunctionAddReturnedExpression((Expression)epls);  :};
 
 go_stmt ::= GO expression;
 
-// Select statements
 
-select_stmt ::= SELECT LBRACE { comm_clause } RBRACE;
-comm_clause ::= comm_case COLON statement_list;
-comm_case ::= CASE ( send_stmt | recv_stmt ) | DEFAULT;
-//Lembrar: Adicionar ":=" na regra abaixo
-recv_stmt ::= expression_list_2 recv_expr;
-recv_expr ::= expression;
+opt_assign ::= EQUAL
+    |  {: RESULT = ""; :};
+opt_assign_exp_list ::= EQUAL:ass expression_list:epl  {: RESULT = "Assigment"; :}
+           |                               {: RESULT = "";          :};
 
-// Return statements
+// STRUCT STATEMENT
+struct_type     ::= STRUCT LBRACE field_decl_star1 RBRACE;
+field_decl_star1 ::= field_decl_star1 field_decl SEMICOLON |;
+field_decl      ::= aux_field_decl_1 aux_field_decl_2;
 
-return_stmt ::= RETURN expression_list_3;
-expression_list_3 ::= expression_list | ;
+aux_field_decl_1 ::= IDENTIFIER aux_field_decl_3| BLANK_IDENTIFIER aux_field_decl_4 | embedded_field_1;
+aux_field_decl_3 ::= identifier_star_1 type  | DOT IDENTIFIER |;
+aux_field_decl_4 ::= identifier_star_1 type ;
+aux_field_decl_2 ::= | tag;
 
-// Break statements
+tag ::= STRING_LITERAL;
 
-break_stmt ::= BREAK label_2;
-label_2 ::= label | ;
+embedded_field_1 ::= MULT type_name;
+opt_mul ::= MULT |;
 
-// Continue statements
+identifier_list ::= identifier identifier_star_1;
+identifier_star_1 ::= COMMA identifier identifier_star_1 |;
 
-continue_stmt ::= CONTINUE label_2;
+type_star ::= type  type_star |;
+type  ::= type_name:tn {: RESULT = tn; :}
+         | type_lit | LPAREN type  RPAREN;
 
-// Goto statements
+type_name     ::= IDENTIFIER:id aux_type_name_1:dotid {: RESULT = id.toString() + dotid.toString(); :}
+                 | BLANK_IDENTIFIER:b             {: RESULT = b;                                :};
 
-goto_stmt ::= GOTO label;
+aux_type_name_1 ::= DOT IDENTIFIER:id                {: RESULT = "." + id.toString();              :}
+                 |                                {: RESULT = "";                               :};
 
-// Fallthrough statements
+type_lit     ::= array_type | pointer_type | slice_type | map_type | channel_type | struct_type | interface_type | function_type;
 
-fallthrough_stmt ::= FALLTHROUGH;
+// ARRAY
+array_length ::= expression;
+array_type   ::= LBRACK array_length RBRACK element_type;
+element_type ::= type ;
 
-// Defer statements
+pointer_type ::= MULT base_type;
+base_type    ::= type ;
 
-defer_stmt ::= DEFER expression;
+// FUNCTION
+function_type     ::= FUNC signature;
+signature        ::= parameters:p aux_result:ar   {: RESULT = p;  :};
 
-// Source file organization
+aux_result        ::= result:r
+                     |;
 
-source_file ::= package_clause SEMICOLON { import_decl SEMICOLON } { top_level_decl SEMICOLON };
+result         ::= HASH LPAREN aux_result_2 RPAREN // HOTFIX HASH
+                  | type_lit 
+                  | type_name:tn   {:  Type type = Type.convertToType(tn.toString()); Semantic.getInstance().FunctionAddReturnType(type); RESULT = type; :};   
+aux_result_2     ::= identifier aux_result_3 | type_lit | LPAREN type  RPAREN;
+aux_result_3     ::= identifier_star_3 | DOT identifier;
 
-// Package clause
+parameters          ::= LPAREN aux_parameters_1 RPAREN;
+aux_parameters_1      ::= parameter_list
+                        |;
 
-package_clause_aux ::= | package_clause:p {:RESULT = p;:};
-package_clause ::= PACKAGE:p package_name:e
-                                     {: System.out.println("PACKAGE RECONIZED: "+ p );:};
-//package_clause ::= PACKAGE package_name;
-package_name ::= identifier:id {:RESULT = id;:}
-		| package_name:pk DOT identifier:id {:RESULT = pk + "." + id;:};
+opt_comma            ::= COMMA |;
 
-// Import declarations
+parameter_list       ::= parameter_decl:pdecl  {: RESULT = pdecl; :};
 
-import_decl_aux ::= | import_decl_e; 
-import_decl_e ::= import_decl | import_decl_e import_decl;
-import_decl ::= IMPORT ( import_spec:i | LPAREN { import_spec:i SEMICOLON } RPAREN )
-				{:System.out.println("IMPORT RECONIZED: "+ i) ;:};
-import_spec ::= dot_2 import_path;
-dot_2 ::= DOT | package_name | ;
-import_path ::= string_lit;
+type_no_identifier    ::= type_lit | LPAREN type  RPAREN;
+parameter_decl       ::= identifier_list_param |
+         SUSPOINTS type  parameter_decl_star |
+         type_no_identifier:t parameter_decl_star   {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().FunctionInitializeParameters(type); :};
+
+parameter_decl_star   ::= COMMA parameter_decl | COMMA | ;
+identifier_list_param ::= identifier:id identifier_star_2:t        {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); :};  // include all posibilities
+// identifier_star_3     ::= identifier_star_2 |;
+identifier_star_2     ::= COMMA identifier:id identifier_star_2:t  {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); RESULT = t; :}
+                        | SUSPOINTS type  parameter_decl_star
+                        | type :t parameter_decl_star             {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().FunctionInitializeParameters(type); RESULT = type; :};
+//identifier_star_4     ::= identifier_list_param | type_no_identifier; // Type
+
+func_identifier_list     ::= identifier func_identifier_list_aux_1;
+func_identifier_list_aux_1 ::= func_identifier_list_aux_1 COMMA identifier |;
+
+// INTERFACE
+interface_type      ::= INTERFACE LBRACE aux_inteface_type_1 RBRACE;
+aux_inteface_type_1   ::= aux_inteface_type_1 method_spec SEMICOLON |;
+method_spec         ::= IDENTIFIER method_spec_aux_1;
+method_spec_aux_1     ::= signature | method_spec_aux_2;
+method_spec_aux_2     ::= DOT IDENTIFIER |;
+
+// SLICE
+slice_type ::= LBRACK RBRACK element_type;
+
+// MAP
+map_type     ::= MAP LBRACK key_type RBRACK element_type;
+key_type     ::= type;
+
+// CHANNEL
+channel_type     ::= aux_channel_type_1 element_type;
+aux_channel_type_1 ::= CHAN | CHAN CHANNEL | CHANNEL CHAN;
+
 

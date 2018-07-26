@@ -9,16 +9,10 @@ import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.Symbol;
 import lexicalanalyzer.go.Sym;
 
-public class Tester {
+public class LexicTester {
 	// Run Generator before executing this script
 
-	//private String path = "/core/src/lexical/tests/comment_and_if.go";
-	//private static String path = "/core/src/lexical/tests/keywords_and_operations.go";
-	//private static String path = "/core/src/lexical/tests/number_literals.go";
-	//private static String path = "/core/src/lexical/tests/rune_and_string_literals.go";
-    //private static String path = "/core/src/lexical/tests/variables.go";
-	private static String path = "/src/lexicalanalyzer/go/examples/program.go";
-	//private static String path = "/core/src/lexical/tests/identifiers.go";
+	private static String path = "/src/examples/lexic.go";
 	
 	public static void main(String[] args) {
 		try {

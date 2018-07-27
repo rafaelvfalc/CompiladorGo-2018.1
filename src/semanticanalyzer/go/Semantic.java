@@ -20,24 +20,62 @@ import codegenerator.go.CodeGenerator;
 
 public class Semantic {
 
-	private static Semantic semantic = new Semantic();	
-	private static CodeGenerator codeGenerator = new CodeGenerator();	
+	/* Semantic instance. */
+	private static Semantic semantic = new Semantic();
+	
+	/* CodeGenerator instance. */
+	private static CodeGenerator codeGenerator = new CodeGenerator();
+	
+	/* Global variables and functions declared. */
 	private Map<String, Variable> variables = new HashMap<>();
 	private Map<String, Function> functions = new HashMap<>();
+	
+	/* Buffer to store variables names while we wait for the type. */
 	private List<String> varNamesBuffer = new ArrayList<>();
+
+	/*
+	 * Buffer to store expressions after assign. By default this one is used to
+	 * store expressions. If a AssignOp is seen then this buffer is transfered to
+	 * exprBufferBeforeAssign.
+	 */
 	private List<Expression> expBuffer = new ArrayList<>();
+	/*
+	 * Buffer to store expression before assign. Only used for assign operations!
+	 */
 	private List<Expression> expBufferBeforeAssign = new ArrayList<>();
+	
+	/*
+	 * Stack containing Scoped entities definitions. After a Scoped entity is finished
+	 * (CURLY_R is found) the scope is removed from stack, but if it's a function
+	 * will still be available in functions.
+	 */
 	private Stack<ScopedEntity> scopeStack = new Stack<>();
 		
-
+	/* File organization:
+	 * 		1. Semantic Basics: basic + buffer related methods.
+	 * 		2. Helper Functions
+	 * 		3. Variables
+	 * 		4. Expressions
+	 * 		5. Functions
+	 * 		6. Scope
+	 * 		7. If Else
+	 *      8. Declaring Variables
+	 *      9. TypeCoersion
+	 *      10. Code Generarion Related
+	 * -----------------------------------------------------------------------------------
+	 * */
+	
+	/* 1. Semantic Basics
+	 * -----------------------------------------------------------------------------------
+	 * */
 	private Semantic() {}
+
+	public static Semantic getInstance() {
+		return semantic;
+	}
 	
 	public CodeGenerator getCodeGenerator() {
 		return codeGenerator;
-	}
-	
-	public static Semantic getInstance() {
-		return semantic;
 	}
 
 	public Map<String, Variable> getVariables() {
@@ -54,6 +92,10 @@ public class Semantic {
 		expBuffer.clear();
 	}
 
+	
+	/* 2. Helper Functions
+	 * -----------------------------------------------------------------------------------
+	 * */
 	public void clear() {
 		varNamesBuffer.clear();
 		
@@ -76,12 +118,16 @@ public class Semantic {
 		throw new SemanticException(message);
 	}
 	
+	/* Auxiliary function to print variables with assigned types */
 	public void printVars() {
 		for (String varName : this.variables.keySet()) {
 			System.out.println("Name: " + varName + ", Type: " + this.variables.get(varName).getType());
 		}
 	}
 	
+	/* 3. Variables
+	 * -----------------------------------------------------------------------------------
+	 * */
 	public boolean checkVariableAllScopes(String name) {
 		Set<String> allVariables = new HashSet<String>();
 		allVariables.addAll(variables.keySet());
@@ -97,19 +143,21 @@ public class Semantic {
 	
 	public void addVariable(Variable var) throws SemanticException {
 		if (checkVariableInCurrentScope(var.getName()))
-			throwSemanticException("Variable " + var.getName() + " ja declarada dentro desse escopo.");
+			throwSemanticException("Variable " + var.getName() + " was already declared in this scope.");
 		
 		if (!scopeStack.isEmpty()) {
-			System.out.println("Adicionando variavel a escopo especifico: " + var);
+			System.out.println("Adding variable in specific scope: " + var);
 			scopeStack.peek().addVariable(var);
 		} else {
+			// if function exists with the same name in the same scope variable can't be declared
 			if(functions.containsKey(var.getName())) {
-				throwSemanticException(var.getName() + " redeclarada nesse bloco.");
+				throwSemanticException(var.getName() + " redeclared in this block.");
 			}
-			System.out.println("Adicionando variavel no escopo main: " + var);
+			System.out.println("Adding variable in main scope: " + var);
 			variables.put(var.getName(), var);
 		}
-
+		
+		/* Code generation */
 		codeGenerator.variableDeclaration(var);
 				
 		System.out.println(variables);
@@ -128,25 +176,30 @@ public class Semantic {
 			if (scopeStack.isEmpty()) {
 				return variables.get(varName);
 			} else {
+				// Check in scopes
 				for (int i = scopeStack.size()-1; i >= 0; i--) {
 					if(scopeStack.get(i).getVariables().containsKey(varName)) {
 						return scopeStack.get(i).getVariables().get(varName);
 					}
 				}
 				
+				// Check if exists in program
 				if(variables.containsKey(varName)) {
 					return variables.get(varName);
 				}
 				
 			}
 		} catch(NullPointerException e) {
-			throwSemanticException("Variavel " + varName + " nao foi declarada.");
+			throwSemanticException("Variable " + varName + " was not declared.");
 		}
 		
-		throwSemanticException("Variavel " + varName + " nao foi declarada.");
+		throwSemanticException("Variable " + varName + " was not declared.");
 		return null;
 	}
 
+	/* 4. Expressions
+	 * -----------------------------------------------------------------------------------
+	 * */
 	public Expression calculateUnaryExpr(String op, Expression expr) throws SemanticException {
 		expr = assignTypeIfNeeded(expr);
 
@@ -167,21 +220,21 @@ public class Semantic {
 		switch (exprType) {
 		case BOOL:
 			if (op == "+" || op == "-") {
-				throwSemanticException("Operando invalido " + op + " para o tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		case INT:
 			if (op == "!") {
-				throwSemanticException("Operando invalido " + op + " para o tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		case FLOAT32:
 			if (op == "!") {
-				throwSemanticException("Operando invalido " + op + " para o tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		default:
-			throwSemanticException("Operando invalido " + op + " para o tipo " + exprType.toString());
+			throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 		}
 	}
 
@@ -218,15 +271,25 @@ public class Semantic {
 		String e2Name = e2.getName();
 
 		if (e1Name != null && e2Name != null) {
-			return "Variavel: " + e1Name + " Variavel: " + e2Name;
+			return "Var: " + e1Name + " Var: " + e2Name;
 		} else if (e1Name != null) {
-			return "Variavel: " + e1Name;
+			return "Var: " + e1Name;
 		} else if (e2Name != null) {
-			return "Variavel: " + e2Name;
+			return "Var: " + e2Name;
 		}
 		return null;
 	}
 
+	/*
+	 * Case 1: If both expressions are typed variables, they must have identical
+	 * types.
+	 * 
+	 * Case 2: If one of the expressions is a typed variable and the other an
+	 * untyped constant or literal, the constant is converted to the variable type.
+	 * 
+	 * Case 3: If both expressions are untyped constants or literals, the resulting
+	 * type is the type of the rightmost constant.
+	 */
 	private Type validateBinOperation(Expression e1, String op, Expression e2) throws SemanticException {
 		Expression e1typed = assignTypeIfNeeded(e1);
 		Expression e2typed = assignTypeIfNeeded(e2);
@@ -234,8 +297,8 @@ public class Semantic {
 		System.out.println(e1 + " " + op + " " + e2);
 		if (e1.getName() != null && e2.getName() != null) {
 			if (e1typed.getType() != e2typed.getType()) {
-				throwSemanticException("Tipos invalidos " + e1typed.getType().toString() + " e "
-						+ e2typed.getType().toString() + " para operacao" + op);
+				throwSemanticException("Invalid types " + e1typed.getType().toString() + " and "
+						+ e2typed.getType().toString() + " for the " + op + " operation");
 			}
 
 			validateSpecificOp(e1typed.getType(), op);
@@ -272,47 +335,51 @@ public class Semantic {
 		switch (exprType) {
 		case BOOL:
 			if (op != "&&" && op != "||" && op != "==" && op != "!=") {
-				throwSemanticException("Operando invalido " + op + " para tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		case INT:
 			if (op == "&&" || op == "||") {
-				throwSemanticException("Operando invalido " + op + " para tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		case FLOAT32:
 			if (op == "&&" || op == "||" || op == "%" || op == "&" || op == "|" || op == "^" || op == "&^" || op == "<<"
 					|| op == ">>") {
-				throwSemanticException("Operando invalido " + op + " para tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		case STRING:
 			if (op == "&&" || op == "||" || op == "-" || op == "*" || op == "/" || op == "%" || op == "&" || op == "|"
 					|| op == "^" || op == "&^" || op == "<<" || op == ">>") {
-				throwSemanticException("Operando invalido " + op + " para tipo " + exprType.toString());
+				throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 			}
 			break;
 		default:
-			throwSemanticException("Operando invalido " + op + " para tipo " + exprType.toString());
+			throwSemanticException("Invalid operand " + op + " for type " + exprType.toString());
 		}
 	}
 
+	/* 5. Functions
+	 * -----------------------------------------------------------------------------------
+	 * */
 	public void createNewFunction(String functionName) throws SemanticException {
 		if(variables.containsKey(functionName)) {
-			throwSemanticException(functionName + " redeclarada nesse bloco.");
+			throwSemanticException(functionName + " redeclared in this block.");
 		}
 		
 		if(functions.containsKey(functionName)) {
-			throwSemanticException(functionName + " ja existe.");
+			throwSemanticException(functionName + " already exists.");
 		}
 		
 		Function f = new Function(functionName);
 		functions.put(functionName, f);
 		
-		System.out.println("Criando funcao: " + functionName);
+		System.out.println("Creating function: " + functionName);
 		System.out.println(functions);
 		createNewScope(f);
 		
+		/* Code generation */
 		codeGenerator.createFunction(f);
 	}
 	
@@ -328,63 +395,75 @@ public class Semantic {
 				f = (Function) scopeStack.get(i);
 				break;
 			} catch(ClassCastException cce) {
+				// IfElse: do nothing
 			}
 		}
 		
 		if(f == null) {
-			throwSemanticException("Palavra chave Return precisa estar dentro da funcao.");
+			throwSemanticException("Retun statement should be inside a function.");
 		}
 		
 		e = assignTypeIfNeeded(e);
 		f.setReturnedExpression(e);
 		clearBuffers();
-
+		
+		/* Code generation */
 		codeGenerator.addReturnCode(e);
 		
 	}
 	
 	public void FunctionAddParameter(String varName) throws SemanticException {
-		System.out.println("Adicionando novo parametro: " + varName);
+		System.out.println("Adding parameter: " + varName);
 		Function f = (Function) scopeStack.peek();
 		Variable var = new Variable(Type.UNKNOWN, varName);
 		f.addParameter(var);
 	}
 	
 	public void FunctionInitializeParameters(Type type) throws SemanticException {
-		System.out.println("Inicializando parametros com tipo: " + type);
+		System.out.println("Initializing parameters with type: " + type);
 		Function f = (Function) scopeStack.peek();
+		/* Code generation */
 		f.initializeParameters(type, codeGenerator);
 	}
 	
 	public void FunctionCheckParameters(Expression expr) throws SemanticException {
-		System.out.println("Chacando parametros:" + expr);
+		System.out.println("Checking parameters:" + expr);
 		System.out.println(expBuffer);
 		try {
+			
+			// Variable can be declared in scope with the same name as a function
+			// if this is the case the function can not be called
 			if(checkVariableAllScopes(expr.getName())) {
-				throwSemanticException("nao pode chamar uma nao-funcao " + expr.getName());
+				throwSemanticException("cannot call non-function " + expr.getName());
 			}
 
 			Function fexpr = functions.get(expr.getName());
 			List<Variable> parameters = fexpr.getParameters();
 			if(parameters.size() != expBuffer.size()) {
-				throwSemanticException("Funcao " + fexpr.getName() + " recebe " + parameters.size() + " parametros. " + expBuffer.size() + " parametros recebidos ao inves disso.");
+				throwSemanticException("Function " + fexpr.getName() + " receives " + parameters.size() + " parameters. " + expBuffer.size() + " parameters found instead.");
 			}
 			
 			for(int i = 0; i < expBuffer.size(); i++) {
 				Expression e = expBuffer.get(i);
 				typeCoersion(parameters.get(i).getType(), e);
+				/* Code generation: loading arguments in parameters registers */
 				codeGenerator.addCodeLoading(parameters.get(i), assignTypeIfNeeded(e)); 
 			}
 			
 		} catch (NullPointerException e) {
-			throwSemanticException("Funcao " + expr.getName() + " nao existe.");
+			throwSemanticException("Function " + expr.getName() + " does not exist.");
 		}
 		
+		/* Code generation: making function call */
 		functionCallCode(expr.getName()); 
 		
 		expBuffer.clear();
 	}
 
+
+	/* 6. Scope
+	 * -----------------------------------------------------------------------------------
+	 * */
 	private void createNewScope(ScopedEntity scope) {
 		scopeStack.push(scope);
 	}
@@ -393,15 +472,21 @@ public class Semantic {
 		ScopedEntity scoped = scopeStack.pop();
 		if (scoped instanceof Function) {
 			((Function) scoped).validateReturnedType();
+			/* Code generation */
 			codeGenerator.endFunction();
 		}
 	}
 	
+	/* Code generation */
 	public void exitCurrentScopeEndIf() {
 		scopeStack.pop();
 		codeGenerator.endIf();
 	}
 
+	/* 7. If Else 
+	 * -----------------------------------------------------------------------------------
+	 * */
+	
 	public void createIf(Expression e) throws SemanticException {
 		e = assignTypeIfNeeded(e);
 		createNewScope(new IfElse(e));
@@ -411,18 +496,29 @@ public class Semantic {
 		createNewScope(new IfElse());
 	}
 	
+	/* 8. Declaring Variables
+	 * -----------------------------------------------------------------------------------
+	 * */
+
+	/*
+	 * In Golang the type and values will be in the end of the declaration.
+	 * 
+	 * Given a type + values this function will consider all variables in
+	 * varNamesBuffer as this type and assign values if they are given.
+	 */
 	public void initializeVars(Type type, String assigment) throws SemanticException {
 		if (assigment.isEmpty()) {
 			for (String varName : this.varNamesBuffer) {
 				addVariable(new Variable(type, varName));
 			}
 		} else if (expBuffer.size() != varNamesBuffer.size()) {
-			throwSemanticException("contador de atribuicao diferente: " + varNamesBuffer.size() + " != " + expBuffer.size());
+			throwSemanticException("assignment count mismatch: " + varNamesBuffer.size() + " != " + expBuffer.size());
 		} else {
 			for (int i = 0, j = varNamesBuffer.size() - 1; i < varNamesBuffer.size(); i++, j--) {
 				Expression exp = this.expBuffer.get(j);
 				String varName = this.varNamesBuffer.get(i);
-				
+
+				// Checking if value type is valid
 				typeCoersion(type, exp);
 
 				addVariable(new Variable(type, varName, exp));
@@ -434,12 +530,15 @@ public class Semantic {
 	
 	public Variable updateVar(Expression expbefr, Expression exp) throws SemanticException {
 		exp = assignTypeIfNeeded(exp);
+		// Expbefr is for sure a variable since its an assignment
 		Variable var = getVariable(expbefr.getName());
 		Type t = typeCoersion(var.getType(), exp);
 
+		// Update var
 		var.setType(t);
 		var.setValue(exp);
-
+		
+		/* Code generation */
 		Object ob = expressionToObject(exp);
 		if (ob instanceof Function) {
 			var.getValue().setReg("R0");
@@ -449,34 +548,36 @@ public class Semantic {
 	}
 
 	public void updateVars(String assignment) throws SemanticException {
-		System.out.println("Atribuicao: " + assignment);
+		System.out.println("Assignment: " + assignment);
 		System.out.println(expBuffer.toString());
 		System.out.println(expBufferBeforeAssign.toString());
 
 		if (assignment == "=") {
 			if (expBuffer.size() != expBufferBeforeAssign.size()) {
 				throwSemanticException(
-						"contador de atribuicao diferente: " + expBufferBeforeAssign.size() + " != " + expBuffer.size());
+						"assignment count mismatch: " + expBufferBeforeAssign.size() + " != " + expBuffer.size());
 			} else {
 				for (int i = 0; i < expBuffer.size(); i++) {
 					Expression expbefr = expBufferBeforeAssign.get(i);
 					Expression exp = expBuffer.get(i);
 					Variable var = updateVar(expbefr, exp);
 					
+					/* Code generation */
 					codeGenerator.variableDeclaration(var);
 				}
 			}
 		} else {
 			if (expBuffer.size() != 1 || expBufferBeforeAssign.size() != 1) {
 				throwSemanticException(
-						"atribuicao " + assignment + " nao permite multiplas variaveis.");
+						"assignment " + assignment + " doest not allow multiple variables.");
 			} else {
 				Expression expbefr = expBufferBeforeAssign.get(0);
 				Expression exp = expBuffer.get(0);
 				
 				Expression resultExpr = calculateOpAssign(assignment, expbefr, exp);
 				Variable var = updateVar(expbefr, resultExpr);
-
+				
+				/* Code generation */
 				codeGenerator.variableDeclaration(var);
 			}
 		}
@@ -504,11 +605,14 @@ public class Semantic {
 			return null;
 		} else if (!variableType.equals(expressionType)) {
 			throwSemanticException(
-					"Tipo de variavel eh " + variableType.name() + " porem tipo da expressao eh " + expressionType.name());
+					"Variable type is " + variableType.name() + " but Expression Type is " + expressionType.name());
 		}
 		return variableType;
 	}
 	
+	/* 9. TypeCoersion 
+	 * -----------------------------------------------------------------------------------
+	 * */
 
 	public Type typeCoersion(Type mainType, Expression e) throws SemanticException {
 		e = assignTypeIfNeeded(e);
@@ -520,7 +624,7 @@ public class Semantic {
 		} else if (mainType == Type.UNKNOWN) {
 			return otherType;
 		} else if (mainType != otherType) {
-			throwSemanticException("Tipos invalidos " + mainType.toString() + " e " + otherType.toString());
+			throwSemanticException("Invalid types " + mainType.toString() + " and " + otherType.toString());
 		}
 		return otherType;
 	}
@@ -534,12 +638,15 @@ public class Semantic {
 			&& (otherType == Type.FLOAT32 || otherType == Type.INT)) {
 			return mainType;
 		} else if (mainType != otherType) {
-			throwSemanticException("Tipos invalidos " + mainType.toString() + " e " + 
-		                           otherType.toString() + " para a operacao " + op);
+			throwSemanticException("Invalid types " + mainType.toString() + " and " + 
+		                           otherType.toString() + " for the " + op + " operation");
 		}
 		return mainType;
 	}
-
+	
+	/* If Expression type is UNKNOWN it means that its a variable or a function. 
+	 * In this case we need to assign a type manually to it.
+	 * */
 	private Expression assignTypeIfNeeded(Expression e) throws SemanticException {
 		Expression newExpression = new Expression(e.getType(), e.getName(), e.getValue());
 		newExpression.setReg(e.getReg());
@@ -561,6 +668,9 @@ public class Semantic {
 		return newExpression;
 	}
 	
+	/* 10. Code Generation Related 
+	 * -----------------------------------------------------------------------------------
+	 * */
 	public void createIfCode() {
 		codeGenerator.createIf();
 	}

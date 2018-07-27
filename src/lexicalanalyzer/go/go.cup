@@ -183,7 +183,7 @@ expression     ::= or_expression:orexp                              {: RESULT = 
 or_expression ::= or_expression:e1 OROR:op and_expression:e2         {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
      | and_expression:aexpr                             {: RESULT = aexpr; :};
 
-and_expression ::= and_expression:e1 AND:op relop_expression:e2       {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
+and_expression ::= and_expression:e1 ANDAND:op relop_expression:e2       {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
       | relop_expression:rexpr                          {: RESULT = rexpr; :};
 
 relop_expression ::= relop_expression:e1 rel_op:op add_expression:e2   {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
@@ -467,5 +467,3 @@ key_type     ::= type;
 // CHANNEL
 channel_type     ::= aux_channel_type_1 element_type;
 aux_channel_type_1 ::= CHAN | CHAN CHANNEL | CHANNEL CHAN;
-
-

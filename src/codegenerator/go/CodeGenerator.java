@@ -19,25 +19,54 @@ import semanticanalyzer.go.objects.Variable;
 
 public class CodeGenerator {
 
-    private Integer lbls;
+	/* Memory indicator. */
+    private Integer labels;
+    
+    /* Memory indicator for functions. */
     private Integer labelsFunction;
     private List<String> codeFunctions;
+
+    // Hack to know if code is inside function or not
     private String currFunctionName;
     private boolean inFunctionScope;
+    
+    /* String that stores the generated assembly code. */
     private String assemblyCode;
+    
+    /* Register indicator. */
     private static String R = "R";
+    
+    /* Used to allocate registers. */
     private static int rnumber;
+
+    /* If else stack. Used to properly define branch statement. */
     private Stack<IfElseScope> ifElseStack = new Stack<>();
     private static int ifnumber;
 
+    /* File organization:
+	 * 		1. CodeGenerator Basics
+	 * 		2. Registers
+	 * 		3. Variable and Parameter Declaration
+	 *  	4. Operations
+	 *      5. Adding Code
+	 *      6. Function
+	 *      7. If Else
+	 * -----------------------------------------------------------------------------------
+	 * */
+
+ 
+	/* 1. CodeGenerator Basics
+	 * -----------------------------------------------------------------------------------
+	 * */
     public CodeGenerator() {
     	init();
     }
 
     public void init() {
-    	lbls = 100;
+    	labels = 100;
     	assemblyCode = "100: LD SP, #4000\n";
         
+    	// Register 0: store a function return
     	rnumber = 0;
     	ifnumber = -1;
         
@@ -49,14 +78,19 @@ public class CodeGenerator {
     
 
     public void generateFinalAssemblyCode(String sourceCode) throws IOException {
+    	// Add functions
     	addFunctionsToCode();
     	
+    	// Write in file
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(sourceCode)));
         writer.write(assemblyCode);
         writer.close();
         init();
     }
     
+	/* 2. Registers
+	 * -----------------------------------------------------------------------------------
+	 * */
     public String allocateRegister(){
         rnumber++;
         return R + rnumber;
@@ -85,6 +119,9 @@ public class CodeGenerator {
         return reg1;
     }
     
+    /* 3. Variable and Parameter Declaration
+	 * -----------------------------------------------------------------------------------
+	 * */
     public void variableDeclaration(Variable var) throws SemanticException {
         System.out.println("declaring variable: " + var);
         if (var.getValue().getValue() != null) {
@@ -104,6 +141,9 @@ public class CodeGenerator {
         addCode("ST " + var.getName() + ", " + reg);
     }
 
+    /* 4. Operations
+	 * -----------------------------------------------------------------------------------
+	 * */
     public Expression generateOpCode(Object obj1, Object obj2, Expression exp, String op) throws SemanticException {
         if(OpToAssembly.isRelop(op)) {
             exp = generateRelopCode(obj1, obj2, exp, op);
@@ -135,10 +175,11 @@ public class CodeGenerator {
         if(!ifElseStack.empty() && !ifElseStack.peek().initialized()) {
         	ifElseStack.peek().initialize(getCurrentLabel(), subReg, reg1, reg2, operator);
         	
+        	// Every if else will have 2 operations in the beginning
         	if(inFunctionScope) {
     			labelsFunction += 16;
     		} else {
-    			lbls += 16;
+    			labels += 16;
     		}
         	
         } else {
@@ -169,6 +210,9 @@ public class CodeGenerator {
 		return exp;
 	}
 
+    /* 5. Adding Code
+	 * -----------------------------------------------------------------------------------
+	 * */
     public void addCode(String assemblyString) {
     	if (!assemblyString.substring(assemblyString.length() - 1).equals("\n")) {
            assemblyString += "\n";
@@ -186,8 +230,8 @@ public class CodeGenerator {
     		functionCode += labelsFunction + ": " + assemblyString;
     		codeFunctions.set(codeFunctions.size()-1, functionCode);
     	} else {
-    		lbls += 8;
-    		assemblyCode += lbls + ": " + assemblyString;
+    		labels += 8;
+    		assemblyCode += labels + ": " + assemblyString;
     	}
     }
     
@@ -204,8 +248,8 @@ public class CodeGenerator {
      		functionCode += labelsFunction + ": " + assemblyString + "#" + (labelsFunction + branchToAddLabels) + "\n";
      		codeFunctions.set(codeFunctions.size()-1, functionCode);
      	} else {
-     		lbls += 8;
-     		assemblyCode += lbls + ": " + assemblyString + "#" + (lbls + branchToAddLabels) + "\n";
+     		labels += 8;
+     		assemblyCode += labels + ": " + assemblyString + "#" + (labels + branchToAddLabels) + "\n";
      	}
 	}
     
@@ -213,6 +257,7 @@ public class CodeGenerator {
         e.setReg(allocateRegister());
         
         String value = e.getValue();
+        // If name == null it is a literal
         if(e.getName() == null) {
         	value = "#" + value;
         }
@@ -227,6 +272,7 @@ public class CodeGenerator {
     
     public void addCodeLoading(Variable v, Expression e) throws SemanticException {
     	String value;
+    	// If name == null it is a literal
         if(e.getName() == null) {
         	value = "#" + e.getValue();
         } else {
@@ -235,6 +281,9 @@ public class CodeGenerator {
     	addCode("LD " + v.getValue().getReg() + ", " + value);
     }
     
+    /* 6. Function
+	 * -----------------------------------------------------------------------------------
+	 * */
     public void createFunction(Function f) {
     	codeFunctions.add("function " + f.getName() + "\n");
     	inFunctionScope = true;
@@ -271,6 +320,9 @@ public class CodeGenerator {
     	}
     }
 	
+	/* 7. If Else
+	 * -----------------------------------------------------------------------------------
+	 * */
     public void createIf() {
     	System.out.println("-------------------Create if");
     	ifnumber++;
@@ -297,8 +349,8 @@ public class CodeGenerator {
 			labelsFunction += 8;
 	    	ifElseStack.peek().setLastBranchLabel(labelsFunction);
 		} else {
-			lbls += 8;
-	    	ifElseStack.peek().setLastBranchLabel(lbls);
+			labels += 8;
+	    	ifElseStack.peek().setLastBranchLabel(labels);
 		}
     }
     
@@ -341,7 +393,7 @@ public class CodeGenerator {
     }
     
     private int getCurrentLabel() {
-    	return inFunctionScope ? labelsFunction : lbls;
+    	return inFunctionScope ? labelsFunction : labels;
     }
     
     private int updateCurrentLabel(int upd) {
@@ -351,8 +403,8 @@ public class CodeGenerator {
 			labelsFunction += upd;
 			label = labelsFunction;
 		} else {
-			lbls += upd;
-			label = lbls;
+			labels += upd;
+			label = labels;
 		}
     	
     	return label;

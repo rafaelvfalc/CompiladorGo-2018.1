@@ -26,10 +26,10 @@ public class SyntaticTester {
 
 			GoLexicalAnalyzer lexer = new GoLexicalAnalyzer(reader, csf);
 			GoSyntaticAnalyzer p = new GoSyntaticAnalyzer(lexer, csf);
-		    System.out.println("Parser runs: ");
+		    System.out.println("Analise sintatica rodando: ");
 		    p.parse();
 
-		    System.out.println("Parsing finished!");
+		    System.out.println("Analise sintatica finalizada!");
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    System.err.println(e.getMessage());

@@ -1,11 +1,11 @@
-package math
+package math;
 
-import "fmt"
-import "time"
+import "fmt";
+import "time";
 
-import   "lib/math"         math.Sin
-import m "lib/math"         m.Sin
-import . "lib/math"         Sin
+import   "lib/math";
+import m "lib/math";
+import . "lib/math";
 
 //teste comentario
 
@@ -18,23 +18,23 @@ comentario
 //-----------------test variavel----------------------
 func main(){
 
-	var a = "initial"
-	var b, c int = 1, 2
-	var d = true
-	var e int
-	f := "short"
+	var a = "initial";
+	var b, c int = 1, 2;
+	var d = true;
+	var e int;
+	f = "short";
 
 	fmt.Println(A + _x);
-}
+};
 
 //-----------------------teste constant------------------------
 
-const s string = "constant"
+const s string = "constant";
 
 func teste_constante() {
-    fmt.Println(s)
-    const n = 500000000
-    const d = 3e20 / n
+    fmt.Println(s);
+    const n = 500000000;
+    const d = 3e20 / n;
 }
 
 //----------------teste for-------------------

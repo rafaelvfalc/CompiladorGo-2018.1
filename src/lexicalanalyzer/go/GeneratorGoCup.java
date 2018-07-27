@@ -8,6 +8,7 @@ import java_cup.internal_error;
 public class GeneratorGoCup {
 
 	private static String filename = "go.cup";
+	//private static String filename = "go_without_semantic.cup";
 	private static String subPath = "/src/lexicalanalyzer/go/" + filename;
 
 	public static void main(String[] args) throws internal_error, IOException, Exception {

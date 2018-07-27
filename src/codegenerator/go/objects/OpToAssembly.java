@@ -1,8 +1,5 @@
 package codegenerator.go.objects;
 
-
-import codegenerator.go.objects.OpToAssembly;
-
 public enum OpToAssembly {
 	
 	ADD("+", "binOp"),

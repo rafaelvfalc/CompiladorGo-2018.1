@@ -1,18 +1,18 @@
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.*;
 
-import semanticanalyzer.go.*;
-import semanticanalyzer.go.objects.*;
+//import semanticanalyzer.go.*;
+//import semanticanalyzer.go.objects.*;
 
 parser code {:
 
     public void report_error(String message, Object info) {
-        StringBuffer m = new StringBuffer("Syntax error: ");
+        StringBuffer m = new StringBuffer("Erro sintatico: ");
 
         if (info instanceof ComplexSymbol) {
             ComplexSymbol s = (ComplexSymbol) info;
             if(s.value != null) m.append( s.value.toString() );
-            m.append( " - Line: " + s.getLeft().getLine() + " - Column: " + s.getLeft().getColumn() );
+            m.append( " - Linha: " + s.getLeft().getLine() + " - Coluna: " + s.getLeft().getColumn() );
         }
 
         m.append(" : " + message);
@@ -21,7 +21,7 @@ parser code {:
     }
 
     public void report_fatal_error(String message, Object info) {
-        System.out.println("Error - " + message);
+        System.out.println("Erro - " + message);
         System.exit(-1);
     }
 :};
@@ -77,53 +77,53 @@ precedence left PLUS, MINUS, OR, XOR;
 start with Source_file;
 
 
-identifier ::= IDENTIFIER:id          {: RESULT = id;  :}
-               | BLANK_IDENTIFIER:bid {: RESULT = bid; :};
+identifier ::= IDENTIFIER
+               | BLANK_IDENTIFIER;
 
 // OPERATIONS
 basic_lit_star ::= basic_lit basic_lit_star |;
 
-basic_lit     ::= INT_LITERAL:i      {: Expression intLit = new Expression(Type.INT, i.toString());       RESULT = intLit;    :}
-                 | FLOAT_LITERAL:f  {: Expression floatLit = new Expression(Type.FLOAT32, f.toString()); RESULT = floatLit;  :}
+basic_lit     ::= INT_LITERAL
+                 | FLOAT_LITERAL
                  | IMG_LITERAL
                  | RUNE_LITERAL
-                 | STRING_LITERAL:s {: Expression stringLit = new Expression(Type.STRING, s.toString()); RESULT = stringLit; :};
+                 | STRING_LITERAL;
 
-boolean_lit ::= TRUE:t               {: Expression trueLit = new Expression(Type.BOOL, t.toString());  RESULT = trueLit;       :}
-            | FALSE:f            {: Expression falseLit = new Expression(Type.BOOL, f.toString()); RESULT = falseLit;      :};
+boolean_lit ::= TRUE
+            | FALSE;
 
-unary_op  ::= PLUS:plus         {: RESULT = plus;  :} 
-   | MINUS:minus      {: RESULT = minus; :}
-   | NOT:not          {: RESULT = not;   :}
-   | XOR:xor          {: RESULT = xor;   :}
-   | MULT:mul          {: RESULT = mul;   :}
-   | AND:addr     {: RESULT = addr;  :}
-   | CHANNEL:cop   {: RESULT = cop;   :};
+unary_op  ::= PLUS
+   | MINUS
+   | NOT
+   | XOR
+   | MULT
+   | AND
+   | CHANNEL;
    
-mul_op    ::= MULT:mul           {: RESULT = mul;  :}
-             | DIV:div         {: RESULT = div;  :}
-             | MOD:mod         {: RESULT = mod;  :}
-             | LSHIFT:lop     {: RESULT = lop;  :}
-             | RSHIFT:rop    {: RESULT = rop;  :}
-             | AND:addr    {: RESULT = addr; :}
-             | ANDNOT:anop {: RESULT = anop; :};
+mul_op    ::= MULT
+             | DIV
+             | MOD
+             | LSHIFT
+             | RSHIFT
+             | AND
+             | ANDNOT;
 
-add_op    ::= PLUS:plus         {: RESULT = plus;  :}
-             | MINUS:minus     {: RESULT = minus; :}
-             | OR:or           {: RESULT = or;    :}
-             | XOR:xor         {: RESULT = xor;   :};
+add_op    ::= PLUS
+             | MINUS
+             | OR
+             | XOR;
 
-rel_op    ::= EQEQ:eqop        {: RESULT = eqop;  :}
-            | NOTEQ:neop       {: RESULT = neop;  :}
-            | LESS:lt            {: RESULT = lt;    :}
-            | LTEQ:let          {: RESULT = let;   :}
-            | GREATER:gt            {: RESULT = gt;    :}
-            | GTEQ:gte          {: RESULT = gte;   :};
-bin_op    ::= OROR:orop        {: RESULT = orop;  :}
-             | AND:and         {: RESULT = and;   :}
-             | rel_op:relop     {: RESULT = relop; :}
-             | add_op:addop     {: RESULT = addop; :}
-             | mul_op:mulop     {: RESULT = mulop; :};
+rel_op    ::= EQEQ
+            | NOTEQ
+            | LESS
+            | LTEQ
+            | GREATER
+            | GTEQ;
+bin_op    ::= OROR
+             | AND
+             | rel_op
+             | add_op
+             | mul_op;
 
 // COMPOSITE LITERAL
 composite_lit     ::= literal_type literal_value;
@@ -160,39 +160,37 @@ package_clause ::= PACKAGE IDENTIFIER;
 
 // OPERAND
 operand_star    ::= operand_star operand |;
-operand        ::= literal:lit                 {: RESULT = lit;  :}
-                   | type_name:tn               {: Expression expTn = new Expression(Type.UNKNOWN, tn.toString(), tn.toString()); RESULT = expTn;  :}
-                   | LPAREN expression:e RPAREN  {: Expression exp = (Expression) e;
-              exp.setValue("(" + exp.getValue() + ")");
-              RESULT = exp; :};
+operand        ::= literal
+                   | type_name
+                   | LPAREN expression RPAREN;
 
-literal        ::= basic_lit:blit               {: RESULT = blit; :}
+literal        ::= basic_lit
        | function_lit
-                   | boolean_lit:bolit          {: RESULT = bolit; :};
+                   | boolean_lit;
  
 // EXPRESSION
-unary_expr      ::= primary_expr:pexp                      {: RESULT = pexp; :}
-                   | unary_op:uop unary_expr:uexpr         {: RESULT = Semantic.getInstance().calculateUnaryExpr(uop.toString(), (Expression) uexpr); :};
+unary_expr      ::= primary_expr
+                   | unary_op unary_expr;
  
-primary_expr    ::= operand:op                                 {: RESULT = op;   :}
-                   | conversion                               {: RESULT = "";   :}
-                   | primary_expr:pexp primary_expr_other_options {: RESULT = pexp;  Semantic.getInstance().FunctionCheckParameters((Expression)pexp);  :};  // Obs: Missing MethodExpr
+primary_expr    ::= operand
+                   | conversion
+                   | primary_expr primary_expr_other_options;
 
-expression     ::= or_expression:orexp                              {: RESULT = orexp; :};
+expression     ::= or_expression;
 
-or_expression ::= or_expression:e1 OROR:op and_expression:e2         {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
-     | and_expression:aexpr                             {: RESULT = aexpr; :};
+or_expression ::= or_expression OROR and_expression
+     | and_expression;
 
-and_expression ::= and_expression:e1 ANDAND:op relop_expression:e2       {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
-      | relop_expression:rexpr                          {: RESULT = rexpr; :};
+and_expression ::= and_expression AND relop_expression
+      | relop_expression;
 
-relop_expression ::= relop_expression:e1 rel_op:op add_expression:e2   {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
-      | add_expression:aexpr                            {: RESULT = aexpr; :};
-add_expression ::= add_expression:e1 add_op:op mul_expression:e2       {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
-                  | mul_expression:mulexp                           {: RESULT = mulexp; :};
+relop_expression ::= relop_expression rel_op add_expression
+      | add_expression;
+add_expression ::= add_expression add_op mul_expression
+                  | mul_expression;
 
-mul_expression ::= mul_expression:e1 mul_op:op unary_expr:e2           {: RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); :}
-                  | unary_expr:uexpr                                {: RESULT = uexpr; :};
+mul_expression ::= mul_expression mul_op unary_expr
+                  | unary_expr;
 
 
 // SLICE, INDEX AND ARGUMENTS
@@ -219,8 +217,8 @@ opt_expression  ::= expression |;
 opt_expression_2 ::= RBRACK | COLON opt_expression; 
 index ::= LBRACK expression RBRACK;
 
-expression_list ::= expression:exp expression_star:exps         {: Semantic.getInstance().addExpression((Expression) exp); RESULT = exp; :} ;
-expression_star ::= COMMA:c expression:exp expression_star:exps {: Semantic.getInstance().addExpression((Expression) exp); RESULT = exp; :}
+expression_list ::= expression expression_star;
+expression_star ::= COMMA expression expression_star
                    |;
 
 conversion     ::= type_conv next_conversion;
@@ -241,9 +239,9 @@ aux_comma_exp   ::= aux_comma_exp COMMA expression | ;
 opt_type       ::= type  | ;
 
 aux_const_spec_2          ::= opt_type EQUAL expression_list | ;
-identifier_list_star_aux ::= identifier_list_star_aux COMMA IDENTIFIER:id {: Semantic.getInstance().addVarName(id.toString()); :}
+identifier_list_star_aux ::= identifier_list_star_aux COMMA IDENTIFIER
                           |;
-identifier_list_star_2   ::= IDENTIFIER:id {: Semantic.getInstance().addVarName(id.toString()); :} identifier_list_star_aux;
+identifier_list_star_2   ::= IDENTIFIER identifier_list_star_aux;
 
 
 // STATEMENT
@@ -255,8 +253,8 @@ statement ::= declaration | labeled_stmt | simple_stmt | go_stmt | return_stmt |
 top_level_decl_star ::= top_level_decl SEMICOLON top_level_decl_star |;
 top_level_decl ::= declaration | function_decl | method_decl;
 
-function_decl ::= FUNC IDENTIFIER:id  {: Semantic.getInstance().createNewFunction(id.toString()); :} signature function_body_opt;
-function_body_opt ::= block {: Semantic.getInstance().exitCurrentScope(); :} 
+function_decl ::= FUNC IDENTIFIER signature function_body_opt;
+function_body_opt ::= block
                     |;
 
 method_decl ::= FUNC parameters IDENTIFIER signature function_body_opt;
@@ -270,9 +268,9 @@ type_spec      ::= IDENTIFIER opt_assign type ;
 var_decl       ::= VAR var_decl_aux;
 var_decl_aux    ::= var_spec | LPAREN var_spec_aux RPAREN;
 var_spec_aux    ::= var_spec_aux var_spec SEMICOLON | ;
-var_spec       ::= identifier_list_star_2 var_spec_aux_2 {: Semantic.getInstance().printVars(); :};
-var_spec_aux_2   ::= type :t opt_assign_exp_list:optAss  {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().initializeVars(type, optAss.toString()); :}
-                  | EQUAL expression_list:epl;
+var_spec       ::= identifier_list_star_2 var_spec_aux_2;
+var_spec_aux_2   ::= type :t opt_assign_exp_list
+                  | EQUAL expression_list;
 
 // LABELLED STATEMENT
 labeled_stmt ::= IDENTIFIER COLON statement;
@@ -282,18 +280,18 @@ simple_stmt ::= expression aux_expression | assignment | INTERROGATION short_var
 aux_expression ::= CHANNEL expression | PLUSPLUS | MINUSMINUS | PLUS PLUS | MINUS MINUS | ;
 
 
-assignment ::= expression_list:el1 assign_op:ass {: Semantic.getInstance().transferExpBuffer();  :} expression_list:el2 {: Semantic.getInstance().updateVars(ass.toString());  :};
+assignment ::= expression_list assign_op expression_list;
 
-assign_op ::= MULTEQ:ma         {: RESULT = ma;     :}
-    | PLUSEQ:aa       {: RESULT = aa;     :}
-    | XOREQ:xa       {: RESULT = xa;     :}
-    | DIVEQ:da       {: RESULT = da;     :}
-    | LSHIFTEQ:la      {: RESULT = la;     :}
-    | RSHIFTEQ:ra     {: RESULT = ra;:}
-    | ANDNOTEQ:ana  {: RESULT = ana;    :}
-    | MINUSEQ:minusa {: RESULT = minusa; :}
-    | ANDEQ:adda {: RESULT = adda;   :}
-    | EQUAL:a            {: RESULT = a;      :};
+assign_op ::= MULTEQ
+    | PLUSEQ
+    | XOREQ
+    | DIVEQ
+    | LSHIFTEQ
+    | RSHIFTEQ
+    | ANDNOTEQ
+    | MINUSEQ
+    | ANDEQ
+    | EQUAL;
 
 short_var_decl ::=  identifier_list CHANNELEQ expression_list;
 
@@ -337,14 +335,14 @@ aux_typeList ::= COMMA type  aux_typeList | ;
 defer_stmt ::= DEFER expression;
 
 // STATEMENT
-if_stmt         ::= IF {: Semantic.getInstance().createIfCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
+if_stmt         ::= IF simple_stmt_aux expression block if_stmt_aux;
 simple_stmt_aux  ::= HASH simple_stmt SEMICOLON | ;
 
-if_stmt_2         ::= IF {: Semantic.getInstance().createIfElseCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
+if_stmt_2         ::= IF simple_stmt_aux expression block if_stmt_aux;
 
-if_stmt_aux      ::=   ELSE {: Semantic.getInstance().exitCurrentScope(); :} if_stmt_2
-                   | ELSE {: Semantic.getInstance().exitCurrentScope(); Semantic.getInstance().createElseCode(); Semantic.getInstance().createElse(); :} block {: Semantic.getInstance().exitCurrentScopeEndIf(); :}
-       |      {: Semantic.getInstance().exitCurrentScopeEndIf(); :};
+if_stmt_aux      ::=   ELSE if_stmt_2
+                   | ELSE block
+       |;
        
 // SELECT STATEMENT
 select_stmt  ::= SELECT LBRACE comm_clause RBRACE;
@@ -352,8 +350,8 @@ comm_clause  ::= comm_case COLON statement_lis comm_clause | ;
 comm_case    ::= CASE stmt_opt | DEFAULT;
 stmt_opt     ::= expression CHANNEL expression | recv_stmt;
 recv_stmt    ::= recv_stmt_aux expression;
-recv_stmt_aux ::= expression_list recv_stmt_aux_2; //FIXME: could be empty, warning: wont fix
-recv_stmt_aux_2 ::= EQUAL | CHANNELEQ;    // Errors in this
+recv_stmt_aux ::= expression_list recv_stmt_aux_2; 
+recv_stmt_aux_2 ::= EQUAL | CHANNELEQ;
 
 //OTHER STATEMENTS
 opt_identifier ::= identifier |;
@@ -362,20 +360,20 @@ goto_stmt ::= GOTO opt_identifier;
 continue_stmt ::= CONTINUE opt_identifier;
 break_stmt ::= BREAK opt_identifier;
 
-expression_list_star ::= expression_list:epl {: RESULT = epl;:}
-        |                  {: RESULT = new Expression();  :};
+expression_list_star ::= expression_list
+        |;
 
 
 // RETURN STATEMENT
-return_stmt ::= RETURN expression_list_star:epls {: Semantic.getInstance().FunctionAddReturnedExpression((Expression)epls);  :};
+return_stmt ::= RETURN expression_list_star;
 
 go_stmt ::= GO expression;
 
 
 opt_assign ::= EQUAL
-    |  {: RESULT = ""; :};
-opt_assign_exp_list ::= EQUAL:ass expression_list:epl  {: RESULT = "Assigment"; :}
-           |                               {: RESULT = "";          :};
+    |;
+opt_assign_exp_list ::= EQUAL expression_list
+           |;
 
 // STRUCT STATEMENT
 struct_type     ::= STRUCT LBRACE field_decl_star1 RBRACE;
@@ -396,14 +394,14 @@ identifier_list ::= identifier identifier_star_1;
 identifier_star_1 ::= COMMA identifier identifier_star_1 |;
 
 type_star ::= type  type_star |;
-type  ::= type_name:tn {: RESULT = tn; :}
+type  ::= type_name
          | type_lit | LPAREN type  RPAREN;
 
-type_name     ::= IDENTIFIER:id aux_type_name_1:dotid {: RESULT = id.toString() + dotid.toString(); :}
-                 | BLANK_IDENTIFIER:b             {: RESULT = b;                                :};
+type_name     ::= IDENTIFIER aux_type_name_1
+                 | BLANK_IDENTIFIER;
 
-aux_type_name_1 ::= DOT IDENTIFIER:id                {: RESULT = "." + id.toString();:}
-                 |                                {: RESULT = ""; :};
+aux_type_name_1 ::= DOT IDENTIFIER
+                 |;
 
 type_lit     ::= array_type | pointer_type | slice_type | map_type | channel_type | struct_type | interface_type | function_type;
 
@@ -417,14 +415,14 @@ base_type    ::= type ;
 
 // FUNCTION
 function_type     ::= FUNC signature;
-signature        ::= parameters:p aux_result:ar   {: RESULT = p;  :};
+signature        ::= parameters aux_result;
 
-aux_result        ::= result:r
+aux_result        ::= result
                      |;
 
 result         ::= HASH LPAREN aux_result_2 RPAREN
                   | type_lit 
-                  | type_name:tn   {:  Type type = Type.convertToType(tn.toString()); Semantic.getInstance().FunctionAddReturnType(type); RESULT = type; :};   
+                  | type_name;   
 aux_result_2     ::= identifier aux_result_3 | type_lit | LPAREN type  RPAREN;
 aux_result_3     ::= identifier_star_3 | DOT identifier;
 
@@ -434,18 +432,18 @@ aux_parameters_1      ::= parameter_list
 
 opt_comma            ::= COMMA |;
 
-parameter_list       ::= parameter_decl:pdecl  {: RESULT = pdecl; :};
+parameter_list       ::= parameter_decl;
 
 type_no_identifier    ::= type_lit | LPAREN type  RPAREN;
 parameter_decl       ::= identifier_list_param |
          SUSPOINTS type  parameter_decl_star |
-         type_no_identifier:t parameter_decl_star   {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().FunctionInitializeParameters(type); :};
+         type_no_identifier:t parameter_decl_star;
 
 parameter_decl_star   ::= COMMA parameter_decl | COMMA | ;
-identifier_list_param ::= identifier:id identifier_star_2:t        {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); :};
-identifier_star_2     ::= COMMA identifier:id identifier_star_2:t  {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); RESULT = t; :}
+identifier_list_param ::= identifier identifier_star_2;
+identifier_star_2     ::= COMMA identifier identifier_star_2
                         | SUSPOINTS type  parameter_decl_star
-                        | type :t parameter_decl_star             {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().FunctionInitializeParameters(type); RESULT = type; :};
+                        | type :t parameter_decl_star;
 
 func_identifier_list     ::= identifier func_identifier_list_aux_1;
 func_identifier_list_aux_1 ::= func_identifier_list_aux_1 COMMA identifier |;
@@ -467,3 +465,5 @@ key_type     ::= type;
 // CHANNEL
 channel_type     ::= aux_channel_type_1 element_type;
 aux_channel_type_1 ::= CHAN | CHAN CHANNEL | CHANNEL CHAN;
+
+

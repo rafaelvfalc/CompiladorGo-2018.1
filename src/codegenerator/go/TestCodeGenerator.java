@@ -1,7 +1,6 @@
 package codegenerator.go;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 
 import java_cup.runtime.ComplexSymbolFactory;
@@ -31,8 +30,5 @@ public class TestCodeGenerator {
 			   }
 		}
 		
-		System.out.println("----------------------------------");
-		System.out.println("All tests passed!");
-		System.out.println("----------------------------------");
 	}
 }

@@ -28,19 +28,19 @@ import lexicalanalyzer.go.Sym;
     }
   
     private Symbol symbol(int sym) {
-    	System.out.println("Token " + Sym.terminalNames[sym] + ", Linha: " + yyline + ", tamanho:" + yylength());
+    	//System.out.println("Token " + Sym.terminalNames[sym] + ", Linha: " + yyline + ", tamanho:" + yylength());
       	return symbolFactory.newSymbol("sym", sym, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+yylength(),yychar+yylength()));
   	}
   
   	private Symbol symbol(int sym, Object val) {
-  		System.out.println("Token (" + Sym.terminalNames[sym] + ", " + val +  ") , Linha: " + yyline + ", tamanho:" + yylength());
+  		//System.out.println("Token (" + Sym.terminalNames[sym] + ", " + val +  ") , Linha: " + yyline + ", tamanho:" + yylength());
 		Location esq = new Location(yyline+1,yycolumn+1,yychar);
 		Location dir = new Location(yyline+1,yycolumn+yylength(), yychar+yylength());
 		return symbolFactory.newSymbol("sym", sym, esq, dir ,val);
   	}
   	
     private Symbol symbol(int sym, Object val,int buflength) {
-        System.out.println("Token (" + Sym.terminalNames[sym] + ", " + val +  ") , Linha: " + yyline + ", tamanho:" + yylength());
+        //System.out.println("Token (" + Sym.terminalNames[sym] + ", " + val +  ") , Linha: " + yyline + ", tamanho:" + yylength());
         Location esq = new Location(yyline+1,yycolumn+yylength()-buflength,yychar+yylength()-buflength);
         Location dir = new Location(yyline+1,yycolumn+yylength(), yychar+yylength());
         return symbolFactory.newSymbol("sym", sym, esq, dir ,val);

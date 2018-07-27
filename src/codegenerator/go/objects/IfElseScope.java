@@ -1,7 +1,5 @@
 package codegenerator.go.objects;
 
-import codegenerator.go.objects.OpToAssembly;
-
 public class IfElseScope {
 
     private String register;

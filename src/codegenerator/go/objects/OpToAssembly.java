@@ -10,14 +10,7 @@ public enum OpToAssembly {
 	AND("&&", "binOp"),
 	OR("||", "binOp"),
 	XOR("^", "binOp"),
-	NOT("!", "binOp"),
-	
-	EQ("==", "relOp", "BNEZ"),
-    NE("!=", "relOp", "BEQZ"),
-	LT("<",  "relOp", "BGEZ"),
-    LTEQ("<=", "relOp", "BGZ"),
-	GT(">", "relOp", "BLEZ"),
-	GTEQ(">=", "relOp", "BLTZ"); 
+	NOT("!", "binOp");
 
 	private final String name;
 	private final String type;

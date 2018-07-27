@@ -337,14 +337,14 @@ aux_typeList ::= COMMA type  aux_typeList | ;
 defer_stmt ::= DEFER expression;
 
 // STATEMENT
-if_stmt         ::= IF {: Semantic.getInstance().createIfCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
+if_stmt         ::= IF simple_stmt_aux expression block if_stmt_aux;
 simple_stmt_aux  ::= HASH simple_stmt SEMICOLON | ;
 
-if_stmt_2         ::= IF {: Semantic.getInstance().createIfElseCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
+if_stmt_2         ::= IF simple_stmt_aux expression block if_stmt_aux;
 
-if_stmt_aux      ::=   ELSE {: Semantic.getInstance().exitCurrentScope(); :} if_stmt_2
-                   | ELSE {: Semantic.getInstance().exitCurrentScope(); Semantic.getInstance().createElseCode(); Semantic.getInstance().createElse(); :} block {: Semantic.getInstance().exitCurrentScopeEndIf(); :}
-       |      {: Semantic.getInstance().exitCurrentScopeEndIf(); :};
+if_stmt_aux      ::=   ELSE if_stmt_2
+                   | ELSE block
+       |;
        
 // SELECT STATEMENT
 select_stmt  ::= SELECT LBRACE comm_clause RBRACE;

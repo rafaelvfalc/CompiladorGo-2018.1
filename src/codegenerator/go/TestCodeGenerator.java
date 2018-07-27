@@ -19,9 +19,12 @@ public class TestCodeGenerator {
 		String outputFilename = outputPath + TestCodeGeneratorAuxiliar.removeExtension("result-codegenerator") + ".asm";
 		Semantic.getInstance().getCodeGenerator().generateFinalAssemblyCode(outputFilename);
 		
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 10; i++) {
 			System.out.println();
 		}
+		
+		System.out.println("***************");
+		System.out.println();
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(rootPath + "result-codegenerator.asm"))) {
 			   String line = null;
@@ -29,6 +32,9 @@ public class TestCodeGenerator {
 			       System.out.println(line);
 			   }
 		}
+		
+		System.out.println();
+		System.out.println("***************");
 		
 	}
 }

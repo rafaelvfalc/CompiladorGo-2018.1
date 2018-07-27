@@ -480,7 +480,7 @@ public class Semantic {
 	/* Code generation */
 	public void exitCurrentScopeEndIf() {
 		scopeStack.pop();
-		codeGenerator.endIf();
+		//codeGenerator.endIf();
 	}
 
 	/* 7. If Else 
@@ -671,7 +671,7 @@ public class Semantic {
 	/* 10. Code Generation Related 
 	 * -----------------------------------------------------------------------------------
 	 * */
-	public void createIfCode() {
+	/*public void createIfCode() {
 		codeGenerator.createIf();
 	}
 	
@@ -681,7 +681,7 @@ public class Semantic {
 	
 	public void createElseCode() {
 		codeGenerator.createElse();
-	}
+	}*/
 	
 	public void functionCallCode(String exprName) {
 		System.out.println("Call " + exprName);

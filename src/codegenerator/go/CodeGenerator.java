@@ -40,8 +40,8 @@ public class CodeGenerator {
     private static int rnumber;
 
     /* If else stack. Used to properly define branch statement. */
-    private Stack<IfElseScope> ifElseStack = new Stack<>();
-    private static int ifnumber;
+    //private Stack<IfElseScope> ifElseStack = new Stack<>();
+    //private static int ifnumber;
 
     /* File organization:
 	 * 		1. CodeGenerator Basics
@@ -68,7 +68,7 @@ public class CodeGenerator {
         
     	// Register 0: store a function return
     	rnumber = 0;
-    	ifnumber = -1;
+    	//ifnumber = -1;
         
         labelsFunction = 992;
     	inFunctionScope = false;
@@ -172,7 +172,7 @@ public class CodeGenerator {
         OpToAssembly operator = OpToAssembly.getOperator(op);
         String subReg = allocateRegister();
         
-        if(!ifElseStack.empty() && !ifElseStack.peek().initialized()) {
+        /*if(!ifElseStack.empty() && !ifElseStack.peek().initialized()) {
         	ifElseStack.peek().initialize(getCurrentLabel(), subReg, reg1, reg2, operator);
         	
         	// Every if else will have 2 operations in the beginning
@@ -182,13 +182,13 @@ public class CodeGenerator {
     			labels += 16;
     		}
         	
-        } else {
+        } else*/ //{
 	        addCode("SUB " + subReg + ", " + reg1 + ", " + reg2);
 	        addCode(operator.getRelOperator() + " " + subReg + ", ", 24);
 	        addCode("LD " + subReg + ", #true");
 	        addCode("BR ", 16);
 	        addCode("LD " + subReg + ", #false");
-        }
+        //}
     	
         exp.setReg(subReg);
         return exp;
@@ -218,13 +218,13 @@ public class CodeGenerator {
            assemblyString += "\n";
         }
 
-    	if (!ifElseStack.empty() && ifElseStack.peek().initialized()) {
+    	/*if (!ifElseStack.empty() && ifElseStack.peek().initialized()) {
     		IfElseScope ifElse = ifElseStack.peek();
     		Integer label = updateCurrentLabel(8);
     		String code = ifElse.getCode();
     		code += label + ": " + assemblyString;
     		ifElse.setCode(code);    		
-    	} else if (inFunctionScope) {
+    	} else*/ if (inFunctionScope) {
     		String functionCode = codeFunctions.get(codeFunctions.size()-1);
     		labelsFunction += 8;
     		functionCode += labelsFunction + ": " + assemblyString;
@@ -236,13 +236,13 @@ public class CodeGenerator {
     }
     
     private void addCode(String assemblyString, int branchToAddLabels) {
-    	if (!ifElseStack.empty() && ifElseStack.peek().initialized()) {
+    	/*if (!ifElseStack.empty() && ifElseStack.peek().initialized()) {
     		IfElseScope ifElse = ifElseStack.peek();
     		Integer label = updateCurrentLabel(8);
     		String code = ifElse.getCode();
     		code += label + ": " + assemblyString + "#" + (labelsFunction + branchToAddLabels) + "\n";
     		ifElse.setCode(code);    		
-    	} else if (inFunctionScope) {
+    	} else*/ if (inFunctionScope) {
      		String functionCode = codeFunctions.get(codeFunctions.size()-1);
      		labelsFunction += 8;
      		functionCode += labelsFunction + ": " + assemblyString + "#" + (labelsFunction + branchToAddLabels) + "\n";
@@ -323,7 +323,7 @@ public class CodeGenerator {
 	/* 7. If Else
 	 * -----------------------------------------------------------------------------------
 	 * */
-    public void createIf() {
+ /*   public void createIf() {
     	System.out.println("-------------------Create if");
     	ifnumber++;
     	IfElseScope ifelse = new IfElseScope("if", ifnumber);
@@ -408,5 +408,5 @@ public class CodeGenerator {
 		}
     	
     	return label;
-    }
+    }*/
 }

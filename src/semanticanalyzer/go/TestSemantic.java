@@ -9,7 +9,7 @@ public class TestSemantic {
 		
 		String rootPath = TestSemanticAuxiliar.getAbsolutePath("/src/examples/");
 		
-		TestSemanticAuxiliar.parse(rootPath + "semantic1.go", csf);
+		TestSemanticAuxiliar.parse(rootPath + "semantic_error_6.go", csf);
 		
 	}
 }

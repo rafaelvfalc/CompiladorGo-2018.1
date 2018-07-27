@@ -1,6 +1,6 @@
 package codegenerator.go.objects;
 
-public enum OpToAssembly {
+public enum OperationsAssembly {
 	
 	ADD("+", "binOp"),
 	SUB("-", "binOp"),
@@ -16,13 +16,13 @@ public enum OpToAssembly {
 	private final String type;
 	private final String relOperator;
 
-	private OpToAssembly(String name, String type) {
+	private OperationsAssembly(String name, String type) {
 		this.name = name;
 		this.type = type;
 		this.relOperator = null;
 	}
 	
-	private OpToAssembly(String name, String type, String relOperator) {
+	private OperationsAssembly(String name, String type, String relOperator) {
 		this.name = name;
 		this.type = type;
 		this.relOperator = relOperator;
@@ -36,8 +36,8 @@ public enum OpToAssembly {
 		return getOperator(op).getType().equals("relOp");
 	}
 	
-	public static OpToAssembly getOperator(String op) {
-		for (OpToAssembly optass : OpToAssembly.values()) {
+	public static OperationsAssembly getOperator(String op) {
+		for (OperationsAssembly optass : OperationsAssembly.values()) {
 			if (optass.name.equals(op)) {
 				return optass;
 			}

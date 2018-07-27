@@ -12,7 +12,8 @@ import java_cup.runtime.ComplexSymbolFactory;
 
 public class SyntaticTester {
 
-	private static String sourcecode = "/src/examples/lexic_syntatic_correct.go";
+	//private static String sourcecode = "/src/examples/lexic_syntatic_correct.go";
+	private static String sourcecode = "/src/examples/syntatic_error_4.go";
 
 	public static void main(String[] args) {
 

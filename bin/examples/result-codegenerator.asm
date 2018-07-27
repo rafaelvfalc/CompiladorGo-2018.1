@@ -1,41 +1,14 @@
 100: LD SP, #4000
-108: LD R1, #10
-116: ST y, R1
-124: LD R2, #2
-132: ST x, R2
-140: SUB R3, R1, R2
-148: BLTZ R3, #172
-156: LD R3, #true
-164: BR #180
-172: LD R3, #false
-180: ST w, R3
-188: SUB R4, R1, R2
-196: BNEZ R4, #220
-204: LD R4, #true
-212: BR #228
-220: LD R4, #false
-228: ST a, R4
-236: SUB R5, R1, R2
-244: BGZ R5, #268
-252: LD R5, #true
-260: BR #276
-268: LD R5, #false
-276: ST b, R5
-284: SUB R6, R1, R2
-292: BEQZ R6, #316
-300: LD R6, #true
-308: BR #324
-316: LD R6, #false
-324: ST c, R6
-332: SUB R7, R1, R2
-340: BLEZ R7, #364
-348: LD R7, #true
-356: BR #372
-364: LD R7, #false
-372: ST d, R7
-380: SUB R8, R1, R2
-388: BGEZ R8, #412
-396: LD R8, #true
-404: BR #420
-412: LD R8, #false
-420: ST e, R8
+108: LD R1, #0
+116: ST var1, R1
+
+function funcao1
+1000: LD R0, #1
+1008: BR *0(SP)
+
+function main
+4016: ADD SP, SP, #mainsize
+4024: ST *SP, #4040
+4032: BR #1000
+4040: SUB SP, SP, #mainsize
+4048: ST var1, R0

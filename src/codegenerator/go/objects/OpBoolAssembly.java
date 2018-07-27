@@ -1,6 +1,6 @@
 package codegenerator.go.objects;
 
-public class OpBoolToAssembly {
+public class OpBoolAssembly {
 
 	// TODO
 	

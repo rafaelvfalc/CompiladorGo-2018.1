@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 import java_cup.runtime.ComplexSymbolFactory;
 import lexicalanalyzer.go.GoLexicalAnalyzer;
-import semanticanalyzer.go.exceptions.SemanticException;
+import semanticanalyzer.go.exceptions.ExceptionSemanticError;
 import semanticanalyzer.go.Semantic;
 import lexicalanalyzer.go.GoSyntaticAnalyzer;
 
@@ -29,7 +29,7 @@ public class TestSemanticAuxiliar {
 			System.out.println("Analisando semanticamente: " + sourceCode);
 			p.parse();
 			System.out.println("Analise semantica finalizada!");
-		} catch (SemanticException e) {
+		} catch (ExceptionSemanticError e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
 			

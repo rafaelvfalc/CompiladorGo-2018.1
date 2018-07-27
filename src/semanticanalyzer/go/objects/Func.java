@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import codegenerator.go.CodeGenerator;
-import semanticanalyzer.go.exceptions.SemanticException;
+import semanticanalyzer.go.exceptions.ExceptionSemanticError;
 
-public class Function extends ScopedEntity {
+public class Func extends EntityWithScope {
 	
 	private Type returnType = Type.VOID;
 	private ArrayList<Variable> parameters;
 	
-	private Expression returnedExpression = new Expression();
+	private Expr returnedExpression = new Expr();
 	private boolean seenReturn = false;
 
 	private Integer labels = null;
 
-	public Function(String name, ArrayList<Variable> parameters) throws SemanticException {
+	public Func(String name, ArrayList<Variable> parameters) throws ExceptionSemanticError {
 		super(name);
 		
 		if (parameters != null) {
@@ -30,13 +30,13 @@ public class Function extends ScopedEntity {
 		}
 	}
 	
-	public Function(String name) throws SemanticException {
+	public Func(String name) throws ExceptionSemanticError {
 		this(name, null);
 	}
 	
-	public void addParameter(Variable v) throws SemanticException {
+	public void addParameter(Variable v) throws ExceptionSemanticError {
 		if(getVariables().containsKey(v.getName())) {
-			throw new SemanticException("Variavel ja declarada " + v.toString());
+			throw new ExceptionSemanticError("Variavel ja declarada " + v.toString());
 		}
 		
 		parameters.add(v);
@@ -71,24 +71,24 @@ public class Function extends ScopedEntity {
 	}
 
 	/* Checks if the function returned what it was supposed to */
-	public void validateReturnedType() throws SemanticException {
+	public void validateReturnedType() throws ExceptionSemanticError {
 		System.out.println(returnedExpression);
 		if (!returnedExpression.getType().equals(returnType))
-			throw new SemanticException("Funcao " + getName() + " era pra ter retornado " + returnType + " mas esta retornando " + returnedExpression.getType());
+			throw new ExceptionSemanticError("Funcao " + getName() + " era pra ter retornado " + returnType + " mas esta retornando " + returnedExpression.getType());
 	}
 
-	public void setReturnedExpression(Expression e) {
+	public void setReturnedExpression(Expr e) {
 		if(!seenReturn) {
 			returnedExpression = e;
 			seenReturn = true;
 		}
 	}
 	
-	public Expression getReturnedExpression() {
+	public Expr getReturnedExpression() {
 		return returnedExpression;
 	}
 
-	public void initializeParameters(Type type, CodeGenerator cg) throws SemanticException {
+	public void initializeParameters(Type type, CodeGenerator cg) throws ExceptionSemanticError {
 		for(Variable v: parameters) {
 			if(v.getType() == Type.UNKNOWN) {
 				v.setType(type);

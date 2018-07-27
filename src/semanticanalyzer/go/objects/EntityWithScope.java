@@ -3,12 +3,12 @@ package semanticanalyzer.go.objects;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ScopedEntity extends NamedEntity {
+public class EntityWithScope extends EntityWithName {
 
 	private HashMap<String, Variable> variables;
 	private HashMap<String, Type> types;
 	
-	public ScopedEntity(String name) {
+	public EntityWithScope(String name) {
 		super(name);
 		variables = new HashMap<String, Variable>();
 	}

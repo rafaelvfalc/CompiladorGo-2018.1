@@ -1796,7 +1796,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int ileft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int iright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object i = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Expression intLit = new Expression(Type.INT, i.toString());       RESULT = intLit;    
+		 Expr intLit = new Expr(Type.INT, i.toString());       RESULT = intLit;    
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("basic_lit",58, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -1808,7 +1808,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int fleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int fright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object f = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Expression floatLit = new Expression(Type.FLOAT32, f.toString()); RESULT = floatLit;  
+		 Expr floatLit = new Expr(Type.FLOAT32, f.toString()); RESULT = floatLit;  
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("basic_lit",58, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -1838,7 +1838,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int sleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int sright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object s = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Expression stringLit = new Expression(Type.STRING, s.toString()); RESULT = stringLit; 
+		 Expr stringLit = new Expr(Type.STRING, s.toString()); RESULT = stringLit; 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("basic_lit",58, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -1850,7 +1850,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int tleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int tright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object t = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Expression trueLit = new Expression(Type.BOOL, t.toString());  RESULT = trueLit;       
+		 Expr trueLit = new Expr(Type.BOOL, t.toString());  RESULT = trueLit;       
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("boolean_lit",61, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -1862,7 +1862,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int fleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int fright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object f = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Expression falseLit = new Expression(Type.BOOL, f.toString()); RESULT = falseLit;      
+		 Expr falseLit = new Expr(Type.BOOL, f.toString()); RESULT = falseLit;      
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("boolean_lit",61, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2567,7 +2567,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int tnleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int tnright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object tn = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Expression expTn = new Expression(Type.UNKNOWN, tn.toString(), tn.toString()); RESULT = expTn;  
+		 Expr expTn = new Expr(Type.UNKNOWN, tn.toString(), tn.toString()); RESULT = expTn;  
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("operand",115, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2579,7 +2579,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)).value;
-		 Expression exp = (Expression) e;
+		 Expr exp = (Expr) e;
               exp.setValue("(" + exp.getValue() + ")");
               RESULT = exp; 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("operand",115, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
@@ -2641,7 +2641,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int uexprleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int uexprright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object uexpr = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = Semantic.getInstance().calculateUnaryExpr(uop.toString(), (Expression) uexpr); 
+		 RESULT = Semantic.getInstance().calculateUnaryExpr(uop.toString(), (Expr) uexpr); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("unary_expr",71, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2674,7 +2674,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int pexpleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)).left;
 		int pexpright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)).right;
 		Object pexp = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)).value;
-		 RESULT = pexp;  Semantic.getInstance().FunctionCheckParameters((Expression)pexp);  
+		 RESULT = pexp;  Semantic.getInstance().FunctionCheckParameters((Expr)pexp);  
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("primary_expr",72, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2704,7 +2704,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); 
+		 RESULT = Semantic.getInstance().calculateExpr((Expr) e1, op.toString(), (Expr) e2); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("or_expression",73, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2734,7 +2734,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); 
+		 RESULT = Semantic.getInstance().calculateExpr((Expr) e1, op.toString(), (Expr) e2); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("and_expression",74, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2764,7 +2764,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); 
+		 RESULT = Semantic.getInstance().calculateExpr((Expr) e1, op.toString(), (Expr) e2); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("relop_expression",75, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2794,7 +2794,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); 
+		 RESULT = Semantic.getInstance().calculateExpr((Expr) e1, op.toString(), (Expr) e2); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("add_expression",77, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -2824,7 +2824,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = Semantic.getInstance().calculateExpr((Expression) e1, op.toString(), (Expression) e2); 
+		 RESULT = Semantic.getInstance().calculateExpr((Expr) e1, op.toString(), (Expr) e2); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("mul_expression",76, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -3085,7 +3085,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int expsleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int expsright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object exps = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Semantic.getInstance().addExpression((Expression) exp); RESULT = exp; 
+		 Semantic.getInstance().addExpression((Expr) exp); RESULT = exp; 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("expression_list",70, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -3103,7 +3103,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int expsleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int expsright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object exps = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Semantic.getInstance().addExpression((Expression) exp); RESULT = exp; 
+		 Semantic.getInstance().addExpression((Expr) exp); RESULT = exp; 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("expression_star",205, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-2)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -4576,7 +4576,7 @@ class CUP$GoSyntaticAnalyzer$actions {
           case 282: // expression_list_star ::= 
             {
               Object RESULT =null;
-		 RESULT = new Expression();  
+		 RESULT = new Expr();  
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("expression_list_star",137, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -4588,7 +4588,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int eplsleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int eplsright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object epls = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 Semantic.getInstance().FunctionAddReturnedExpression((Expression)epls);  
+		 Semantic.getInstance().FunctionAddReturnedExpression((Expr)epls);  
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("return_stmt",163, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;

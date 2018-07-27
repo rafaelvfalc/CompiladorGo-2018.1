@@ -1,27 +1,27 @@
 package semanticanalyzer.go.objects;
 
-import semanticanalyzer.go.objects.Expression;
+import semanticanalyzer.go.objects.Expr;
 import semanticanalyzer.go.objects.Type;
-import semanticanalyzer.go.objects.TypedEntity;
+import semanticanalyzer.go.objects.EntityWithType;
 
-public class Expression extends TypedEntity {
+public class Expr extends EntityWithType {
 
 	private String value;
 	private String reg;
 
-	public Expression() {
+	public Expr() {
 		super(Type.VOID, null);
 		this.value = null;
 		this.reg = null;
 	}
 	
-	public Expression(Type type, String value) {
+	public Expr(Type type, String value) {
 		super(type, null);
 		this.value = value;
 		this.reg = null;
 	}
 
-	public Expression(Type t, String name, String value) {
+	public Expr(Type t, String name, String value) {
 		super(t, name);
 		this.value = value;
 		this.reg = null;
@@ -37,7 +37,7 @@ public class Expression extends TypedEntity {
 		super.setType(type);
 	}
 
-	public void setValue(Expression exp) {
+	public void setValue(Expr exp) {
 		if (!exp.getType().equals(Type.UNKNOWN))
 			setType(exp.getType());
 		this.value = exp.getValue();

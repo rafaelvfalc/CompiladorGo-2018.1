@@ -10,13 +10,13 @@ import semanticanalyzer.go.TestSemanticAuxiliar;
 
 public class TestCodeGenerator {
 	public static void main(String[] args) throws Exception {
-		ComplexSymbolFactory csf = new ComplexSymbolFactory();
+		ComplexSymbolFactory c = new ComplexSymbolFactory();
 		
-		String rootPath = TestSemanticAuxiliar.getAbsolutePath("/src/examples/");
-		String outputPath = TestSemanticAuxiliar.getAbsolutePath("/src/examples/");
+		String root = TestSemanticAuxiliar.getAbsolutePath("/src/examples/");
+		String output = TestSemanticAuxiliar.getAbsolutePath("/src/examples/");
 
-		TestSemanticAuxiliar.parse(rootPath + "codegenerator.go", csf);
-		String outputFilename = outputPath + TestCodeGeneratorAuxiliar.removeExtension("result-codegenerator") + ".asm";
+		TestSemanticAuxiliar.parse(root + "codegenerator_4.go", c);
+		String outputFilename = output + TestCodeGeneratorAuxiliar.removeExtension("result-codegenerator") + ".asm";
 		Semantic.getInstance().getCodeGenerator().generateFinalAssemblyCode(outputFilename);
 		
 		for (int i = 0; i < 10; i++) {
@@ -26,7 +26,7 @@ public class TestCodeGenerator {
 		System.out.println("***************");
 		System.out.println();
 		
-		try (BufferedReader br = new BufferedReader(new FileReader(rootPath + "result-codegenerator.asm"))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(root + "result-codegenerator.asm"))) {
 			   String line = null;
 			   while ((line = br.readLine()) != null) {
 			       System.out.println(line);

@@ -181,7 +181,7 @@ expression     ::= or_expression;
 or_expression ::= or_expression OROR and_expression
      | and_expression;
 
-and_expression ::= and_expression AND relop_expression
+and_expression ::= and_expression ANDAND relop_expression
       | relop_expression;
 
 relop_expression ::= relop_expression rel_op add_expression

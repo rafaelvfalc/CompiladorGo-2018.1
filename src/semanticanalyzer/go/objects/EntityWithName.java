@@ -1,10 +1,10 @@
 package semanticanalyzer.go.objects;
 
-public class NamedEntity {
+public class EntityWithName {
 	
 	private String name;
 	
-	public NamedEntity(String name) {
+	public EntityWithName(String name) {
 		this.name = name;
 	}
 	

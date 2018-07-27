@@ -11,7 +11,8 @@ import lexicalanalyzer.go.Sym;
 
 public class LexicTester {
 
-	private static String path = "/src/examples/lexic_syntatic_correct.go";
+	//private static String path = "/src/examples/lexic_syntatic_correct.go";
+	private static String path = "/src/examples/lexic_error.go";
 	
 	public static void main(String[] args) {
 		try {

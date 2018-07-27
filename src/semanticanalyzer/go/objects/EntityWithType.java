@@ -1,13 +1,13 @@
 package semanticanalyzer.go.objects;
 
-import semanticanalyzer.go.objects.NamedEntity;
+import semanticanalyzer.go.objects.EntityWithName;
 import semanticanalyzer.go.objects.Type;
 
-public class TypedEntity extends NamedEntity {
+public class EntityWithType extends EntityWithName {
 	
 	private Type type;
 	
-	public TypedEntity(Type type, String name) {
+	public EntityWithType(Type type, String name) {
 		super(name);
 		this.type = type;
 	}

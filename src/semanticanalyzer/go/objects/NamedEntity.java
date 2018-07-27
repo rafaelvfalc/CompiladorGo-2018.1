@@ -1,8 +1,5 @@
 package semanticanalyzer.go.objects;
 
-/**
- *	Entity that has a name.
- */
 public class NamedEntity {
 	
 	private String name;

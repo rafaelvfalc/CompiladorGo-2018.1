@@ -22,6 +22,6 @@ public enum Type {
 			}
 		}
 
-		throw new SemanticException("Invalid type: " + typeName);
+		throw new SemanticException("Tipo invalido: " + typeName);
 	}
 }

@@ -10,9 +10,8 @@ import java_cup.runtime.Symbol;
 import lexicalanalyzer.go.Sym;
 
 public class LexicTester {
-	// Run Generator before executing this script
 
-	private static String path = "/src/examples/lexic.go";
+	private static String path = "/src/examples/lexic_syntatic_correct.go";
 	
 	public static void main(String[] args) {
 		try {

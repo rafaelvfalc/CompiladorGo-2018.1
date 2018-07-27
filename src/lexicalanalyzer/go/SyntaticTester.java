@@ -12,7 +12,7 @@ import java_cup.runtime.ComplexSymbolFactory;
 
 public class SyntaticTester {
 
-	private static String sourcecode = "/src/examples/syntatic.go";
+	private static String sourcecode = "/src/examples/lexic_syntatic_correct.go";
 
 	public static void main(String[] args) {
 
@@ -25,11 +25,9 @@ public class SyntaticTester {
 			Reader reader = new InputStreamReader(stream);
 
 			GoLexicalAnalyzer lexer = new GoLexicalAnalyzer(reader, csf);
-			// start parsing
 			GoSyntaticAnalyzer p = new GoSyntaticAnalyzer(lexer, csf);
 		    System.out.println("Parser runs: ");
 		    p.parse();
-		    // p.debug_parse();
 
 		    System.out.println("Parsing finished!");
 		} catch (Exception e) {

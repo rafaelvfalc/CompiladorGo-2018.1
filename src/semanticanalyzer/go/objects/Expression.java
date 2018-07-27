@@ -1,11 +1,14 @@
 package semanticanalyzer.go.objects;
 
+import semanticanalyzer.go.objects.Expression;
+import semanticanalyzer.go.objects.Type;
+import semanticanalyzer.go.objects.TypedEntity;
+
 public class Expression extends TypedEntity {
 
 	private String value;
 	private String reg;
-	
-	/* Empty expression */
+
 	public Expression() {
 		super(Type.VOID, null);
 		this.value = null;
@@ -30,7 +33,7 @@ public class Expression extends TypedEntity {
 
 	public void setType(Type type) {
 		if (!getType().equals(Type.UNKNOWN) && !type.equals(getType()))
-			System.out.println("Semantic error, Illegal Type Assignment " + type + " and " + getType());
+			System.out.println("Erro semantico, tipo atribuido nao permitido " + type + " e " + getType());
 		super.setType(type);
 	}
 
@@ -53,7 +56,7 @@ public class Expression extends TypedEntity {
 	}
 
 	public String toString() {
-		return "{ Expression: " + getType() + " " + getValue() + "  }";
+		return "{ Expressao: " + getType() + " " + getValue() + "  }";
 	}
 
 }

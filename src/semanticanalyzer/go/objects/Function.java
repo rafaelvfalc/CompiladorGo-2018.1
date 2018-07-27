@@ -3,18 +3,17 @@ package semanticanalyzer.go.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-//import code_generation.CodeGenerator;
+import codegenerator.go.CodeGenerator;
 import semanticanalyzer.go.exceptions.SemanticException;
 
 public class Function extends ScopedEntity {
 	
-	private Type returnType = Type.VOID;            // Default Return Type
+	private Type returnType = Type.VOID;
 	private ArrayList<Variable> parameters;
 	
 	private Expression returnedExpression = new Expression();
 	private boolean seenReturn = false;
-	
-	/* Code generation */
+
 	private Integer labels = null;
 
 	public Function(String name, ArrayList<Variable> parameters) throws SemanticException {
@@ -37,7 +36,7 @@ public class Function extends ScopedEntity {
 	
 	public void addParameter(Variable v) throws SemanticException {
 		if(getVariables().containsKey(v.getName())) {
-			throw new SemanticException("Variable already declared " + v.toString());
+			throw new SemanticException("Variavel ja declarada " + v.toString());
 		}
 		
 		parameters.add(v);
@@ -75,7 +74,7 @@ public class Function extends ScopedEntity {
 	public void validateReturnedType() throws SemanticException {
 		System.out.println(returnedExpression);
 		if (!returnedExpression.getType().equals(returnType))
-			throw new SemanticException("Function " + getName() + " was supposed to return " + returnType + " but is returning " + returnedExpression.getType() + " instead.");
+			throw new SemanticException("Funcao " + getName() + " era pra ter retornado " + returnType + " mas esta retornando " + returnedExpression.getType());
 	}
 
 	public void setReturnedExpression(Expression e) {
@@ -89,17 +88,17 @@ public class Function extends ScopedEntity {
 		return returnedExpression;
 	}
 
-//	public void initializeParameters(Type type, CodeGenerator cg) throws SemanticException {
-//		for(Variable v: parameters) {
-//			if(v.getType() == Type.UNKNOWN) {
-//				v.setType(type);
-//				cg.parameterDeclaration(v);
-//			}
-//		}	
-//	}
+	public void initializeParameters(Type type, CodeGenerator cg) throws SemanticException {
+		for(Variable v: parameters) {
+			if(v.getType() == Type.UNKNOWN) {
+				v.setType(type);
+				cg.parameterDeclaration(v);
+			}
+		}	
+	}
 	
 	@Override
 	public String toString() {
-		return "{ Function: " + getName() + " " + getReturnType() + " " + parameters + " }";
+		return "{ Funcao: " + getName() + " " + getReturnType() + " " + parameters + " }";
 	}
 }

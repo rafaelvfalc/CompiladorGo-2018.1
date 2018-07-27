@@ -1,5 +1,9 @@
 package semanticanalyzer.go.objects;
 
+import semanticanalyzer.go.objects.Expression;
+import semanticanalyzer.go.objects.Type;
+import semanticanalyzer.go.objects.TypedEntity;
+
 public class Variable extends TypedEntity {
 
 	private Expression value;
@@ -40,6 +44,6 @@ public class Variable extends TypedEntity {
 	}
 	
 	public String toString() {
-		return "variable: " + getName() + ", type: " + getType() + ", value: " + value; 
+		return "Variavel: " + getName() + ", tipo: " + getType() + ", valor: " + value; 
 	}
 }

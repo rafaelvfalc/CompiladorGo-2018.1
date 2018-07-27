@@ -125,7 +125,7 @@ bin_op    ::= OROR:orop        {: RESULT = orop;  :}
              | add_op:addop     {: RESULT = addop; :}
              | mul_op:mulop     {: RESULT = mulop; :};
 
-/* --------------- Composite literal------------ */
+// COMPOSITE LITERAL
 composite_lit     ::= literal_type literal_value;
 literal_type      ::= struct_type | array_type | LBRACK SUSPOINTS RBRACK element_type | slice_type | map_type | type_name;
 literal_value     ::= LBRACE literal_value_aux_1 RBRACE;
@@ -278,7 +278,7 @@ var_spec_aux_2   ::= type :t opt_assign_exp_list:optAss  {: Type type = Type.con
 labeled_stmt ::= IDENTIFIER COLON statement;
 
 // SIMPLE STATEMENT
-simple_stmt ::= expression aux_expression | assignment | INTERROGATION short_var_decl |;  // HOT FIX INTERROGATION
+simple_stmt ::= expression aux_expression | assignment | INTERROGATION short_var_decl |;
 aux_expression ::= CHANNEL expression | PLUSPLUS | MINUSMINUS | PLUS PLUS | MINUS MINUS | ;
 
 
@@ -293,7 +293,7 @@ assign_op ::= MULTEQ:ma         {: RESULT = ma;     :}
     | ANDNOTEQ:ana  {: RESULT = ana;    :}
     | MINUSEQ:minusa {: RESULT = minusa; :}
     | ANDEQ:adda {: RESULT = adda;   :}
-    | EQUAL:a            {: RESULT = a;      :}; // Missing other types of assignment
+    | EQUAL:a            {: RESULT = a;      :};
 
 short_var_decl ::=  identifier_list CHANNELEQ expression_list;
 
@@ -338,7 +338,7 @@ defer_stmt ::= DEFER expression;
 
 // STATEMENT
 if_stmt         ::= IF {: Semantic.getInstance().createIfCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
-simple_stmt_aux  ::= HASH simple_stmt SEMICOLON | ; // HOTFIX HASH
+simple_stmt_aux  ::= HASH simple_stmt SEMICOLON | ;
 
 if_stmt_2         ::= IF {: Semantic.getInstance().createIfElseCode(); :} simple_stmt_aux expression:e {: Semantic.getInstance().createIf((Expression) e); :} block if_stmt_aux;
 
@@ -362,7 +362,7 @@ goto_stmt ::= GOTO opt_identifier;
 continue_stmt ::= CONTINUE opt_identifier;
 break_stmt ::= BREAK opt_identifier;
 
-expression_list_star ::= expression_list:epl {: RESULT = epl;               :}
+expression_list_star ::= expression_list:epl {: RESULT = epl;:}
         |                  {: RESULT = new Expression();  :};
 
 
@@ -402,8 +402,8 @@ type  ::= type_name:tn {: RESULT = tn; :}
 type_name     ::= IDENTIFIER:id aux_type_name_1:dotid {: RESULT = id.toString() + dotid.toString(); :}
                  | BLANK_IDENTIFIER:b             {: RESULT = b;                                :};
 
-aux_type_name_1 ::= DOT IDENTIFIER:id                {: RESULT = "." + id.toString();              :}
-                 |                                {: RESULT = "";                               :};
+aux_type_name_1 ::= DOT IDENTIFIER:id                {: RESULT = "." + id.toString();:}
+                 |                                {: RESULT = ""; :};
 
 type_lit     ::= array_type | pointer_type | slice_type | map_type | channel_type | struct_type | interface_type | function_type;
 
@@ -422,7 +422,7 @@ signature        ::= parameters:p aux_result:ar   {: RESULT = p;  :};
 aux_result        ::= result:r
                      |;
 
-result         ::= HASH LPAREN aux_result_2 RPAREN // HOTFIX HASH
+result         ::= HASH LPAREN aux_result_2 RPAREN
                   | type_lit 
                   | type_name:tn   {:  Type type = Type.convertToType(tn.toString()); Semantic.getInstance().FunctionAddReturnType(type); RESULT = type; :};   
 aux_result_2     ::= identifier aux_result_3 | type_lit | LPAREN type  RPAREN;
@@ -442,12 +442,10 @@ parameter_decl       ::= identifier_list_param |
          type_no_identifier:t parameter_decl_star   {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().FunctionInitializeParameters(type); :};
 
 parameter_decl_star   ::= COMMA parameter_decl | COMMA | ;
-identifier_list_param ::= identifier:id identifier_star_2:t        {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); :};  // include all posibilities
-// identifier_star_3     ::= identifier_star_2 |;
+identifier_list_param ::= identifier:id identifier_star_2:t        {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); :};
 identifier_star_2     ::= COMMA identifier:id identifier_star_2:t  {: Semantic.getInstance().FunctionAddParameter(id.toString()); Semantic.getInstance().FunctionInitializeParameters((Type)t); RESULT = t; :}
                         | SUSPOINTS type  parameter_decl_star
                         | type :t parameter_decl_star             {: Type type = Type.convertToType(t.toString()); Semantic.getInstance().FunctionInitializeParameters(type); RESULT = type; :};
-//identifier_star_4     ::= identifier_list_param | type_no_identifier; // Type
 
 func_identifier_list     ::= identifier func_identifier_list_aux_1;
 func_identifier_list_aux_1 ::= func_identifier_list_aux_1 COMMA identifier |;

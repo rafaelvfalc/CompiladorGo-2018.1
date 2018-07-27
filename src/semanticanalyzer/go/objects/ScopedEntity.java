@@ -3,10 +3,6 @@ package semanticanalyzer.go.objects;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *	Entity that has a scope. All variables here hold only to the
- *  scope of this entity.
- */
 public class ScopedEntity extends NamedEntity {
 
 	private HashMap<String, Variable> variables;

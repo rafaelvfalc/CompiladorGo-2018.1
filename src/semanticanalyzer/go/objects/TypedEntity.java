@@ -1,8 +1,8 @@
 package semanticanalyzer.go.objects;
 
-/**
- *	Entity that has a name and a type.
- */
+import semanticanalyzer.go.objects.NamedEntity;
+import semanticanalyzer.go.objects.Type;
+
 public class TypedEntity extends NamedEntity {
 	
 	private Type type;

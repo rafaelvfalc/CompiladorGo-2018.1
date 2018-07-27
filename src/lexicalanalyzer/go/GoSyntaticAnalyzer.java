@@ -4356,7 +4356,7 @@ class CUP$GoSyntaticAnalyzer$actions {
           case 257: // NT$3 ::= 
             {
               Object RESULT =null;
- //Semantic.getInstance().createIfCode(); 
+ Semantic.getInstance().createIfCode(); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("NT$3",211, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -4409,7 +4409,7 @@ class CUP$GoSyntaticAnalyzer$actions {
           case 262: // NT$5 ::= 
             {
               Object RESULT =null;
- //Semantic.getInstance().createIfElseCode(); 
+ Semantic.getInstance().createIfElseCode(); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("NT$5",213, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -4464,7 +4464,7 @@ class CUP$GoSyntaticAnalyzer$actions {
           case 267: // NT$8 ::= 
             {
               Object RESULT =null;
- //Semantic.getInstance().exitCurrentScope(); Semantic.getInstance().createElseCode(); Semantic.getInstance().createElse(); 
+ Semantic.getInstance().exitCurrentScope(); Semantic.getInstance().createElseCode(); Semantic.getInstance().createElse(); 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("NT$8",216, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -4649,7 +4649,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int eplleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int eplright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object epl = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = epl;               
+		 RESULT = epl;
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("expression_list_star",137, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -5009,7 +5009,7 @@ class CUP$GoSyntaticAnalyzer$actions {
 		int idleft = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).left;
 		int idright = ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$GoSyntaticAnalyzer$stack.peek()).value;
-		 RESULT = "." + id.toString();              
+		 RESULT = "." + id.toString();
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("aux_type_name_1",10, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.elementAt(CUP$GoSyntaticAnalyzer$top-1)), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
@@ -5018,7 +5018,7 @@ class CUP$GoSyntaticAnalyzer$actions {
           case 323: // aux_type_name_1 ::= 
             {
               Object RESULT =null;
-		 RESULT = "";                               
+		 RESULT = ""; 
               CUP$GoSyntaticAnalyzer$result = parser.getSymbolFactory().newSymbol("aux_type_name_1",10, ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), ((java_cup.runtime.Symbol)CUP$GoSyntaticAnalyzer$stack.peek()), RESULT);
             }
           return CUP$GoSyntaticAnalyzer$result;
